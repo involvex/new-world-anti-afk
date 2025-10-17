@@ -44,15 +44,35 @@ A smart AFK prevention tool for New World that sends random key presses to preve
    - Show notifications when starting/stopping (if enabled)
    - Display status in tray icon tooltip
 
-### Manual Build
+### GitHub Pages
 
-If you prefer to build manually:
+The documentation site is automatically deployed when changes are pushed to the main branch:
 
-```bash
-dotnet restore
-dotnet build --configuration Release
-dotnet run --configuration Release
-```
+🌐 **Live Site:** `https://involvex.github.io/new-world-anti-afk/`
+
+### Documentation Features
+
+- **Responsive Design**: Works perfectly on desktop, tablet, and mobile
+- **Dark/Light Mode**: Toggle between themes with persistent preference
+- **Interactive Elements**: Tabbed settings preview, hover effects, animations
+- **Modern UI**: Clean design with New World theming and gradients
+- **Accessibility**: Keyboard navigation, ARIA labels, and screen reader support
+- **Performance**: Optimized loading with intersection observers and lazy loading
+
+## Supporting the Project
+
+This project is open source and free to use. If you'd like to support the development:
+
+### GitHub Sponsors
+Enable GitHub Sponsors in your repository settings to allow community contributions.
+
+### Other Platforms
+Update `.github/FUNDING.yml` with your preferred funding platforms:
+- **Buy Me a Coffee**: For one-time donations
+- **PayPal**: Direct payment support
+- **Custom Links**: Add your own sponsorship URLs
+
+The funding information will appear on your repository main page and can be linked from the documentation site.
 
 ## Settings & Configuration
 
@@ -117,8 +137,21 @@ All settings are automatically saved to `settings.json` and persist between sess
 ├── NewWorldAfkPreventer.csproj # .NET project file
 ├── build-and-run.bat          # Build script
 ├── quick-start.bat            # Quick start script
+├── create-release.bat         # Release creation script
+├── setup-github.bat           # GitHub repository setup
 ├── create-icon.bat            # Icon creation helper
 ├── fokusnewworldscreenshot.ps1 # Legacy PowerShell script
+├── .github/
+│   ├── workflows/
+│   │   ├── release.yml        # Release workflow
+│   │   └── pages.yml          # Documentation deployment
+│   └── FUNDING.yml            # Sponsorship configuration
+├── docs/                      # Documentation website
+│   ├── index.html             # Main documentation page
+│   ├── styles.css             # Modern responsive styles
+│   ├── script.js              # Interactive functionality
+│   ├── package.json           # Node.js dependencies
+│   └── vite.config.js         # Build configuration
 ├── settings.json              # Settings file (created automatically)
 ├── app.ico                    # Custom tray icon (bundled with application)
 └── README.md                  # This file
@@ -147,6 +180,13 @@ Feel free to improve the algorithm, add features, or fix issues:
 5. Submit a pull request
 
 ## Changelog
+
+### v1.3.0
+- **Documentation Site**: Modern responsive website with dark/light mode
+- **GitHub Pages Integration**: Automated deployment of documentation
+- **Interactive Features**: Tabbed settings preview, animations, and copy buttons
+- **Mobile Responsive**: Optimized design for all screen sizes
+- **Sponsorship Support**: GitHub Sponsors and funding platform integration
 
 ### v1.2.0
 - **Bundled Icon**: Custom app.ico now automatically included in all builds

@@ -1,0 +1,13 @@
+{
+  "name": "newworld-afk-preventer-docs",
+  "version": "1.0.0",
+  "description": "Documentation site for New World AFK Preventer",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^4.4.0"
+  }
+}

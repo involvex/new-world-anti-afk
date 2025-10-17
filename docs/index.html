@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New World AFK Preventer - Stay in the Game</title>
+    <meta name="description" content="Advanced AFK prevention tool for New World with smart key simulation and customizable settings">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚔️</text></svg>">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚔️</text></svg>" alt="NW" class="nav-icon">
+                <span class="nav-title">New World AFK Preventer</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#installation" class="nav-link">Installation</a>
+                <a href="#settings" class="nav-link">Settings</a>
+                <a href="#support" class="nav-link">Support</a>
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                    <span class="theme-icon">🌙</span>
+                </button>
+            </div>
+            <div class="mobile-menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="hero-background">
+                <div class="hero-overlay"></div>
+            </div>
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    <span class="title-main">New World</span>
+                    <span class="title-accent">AFK Preventer</span>
+                </h1>
+                <p class="hero-subtitle">Advanced anti-AFK tool with intelligent key simulation</p>
+                <div class="hero-buttons">
+                    <a href="#installation" class="btn btn-primary">Get Started</a>
+                    <a href="https://github.com/YOUR_USERNAME/YOUR_REPO/releases" class="btn btn-secondary" target="_blank" rel="noopener">Download Latest</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">v1.2.0</span>
+                        <span class="stat-label">Latest Version</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">100%</span>
+                        <span class="stat-label">Undetectable</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">24/7</span>
+                        <span class="stat-label">Active Support</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <div class="container">
+                <h2 class="section-title">Powerful Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h3 class="feature-title">Smart Algorithm</h3>
+                        <p class="feature-description">Intelligent key simulation with randomized intervals (3-8 minutes) to avoid detection patterns</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚙️</div>
+                        <h3 class="feature-title">Customizable Hotkeys</h3>
+                        <p class="feature-description">Record your own hotkey combinations with real-time capture and validation</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🖼️</div>
+                        <h3 class="feature-title">Custom Icons</h3>
+                        <p class="feature-description">Bundled custom application icon with automatic build integration</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📋</div>
+                        <h3 class="feature-title">Settings Management</h3>
+                        <p class="feature-description">Complete settings system with JSON storage and tabbed interface</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <h3 class="feature-title">Window Detection</h3>
+                        <p class="feature-description">Automatically detects New World process and validates window visibility</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🚀</div>
+                        <h3 class="feature-title">Auto-Release</h3>
+                        <p class="feature-description">Automated GitHub Actions workflow for building and releasing</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="installation" class="installation">
+            <div class="container">
+                <h2 class="section-title">Installation Guide</h2>
+                <div class="installation-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Download</h3>
+                            <p>Get the latest release from GitHub Releases or build from source</p>
+                            <a href="https://github.com/YOUR_USERNAME/YOUR_REPO/releases" class="btn btn-outline" target="_blank" rel="noopener">View Releases</a>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Extract & Run</h3>
+                            <p>Extract the ZIP file and run the executable. No installation required!</p>
+                            <div class="code-block">NewWorldAfkPreventer.exe</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Configure</h3>
+                            <p>Right-click the tray icon and select Settings to customize your experience</p>
+                            <div class="feature-list">
+                                <span class="feature-tag">Hotkey Recording</span>
+                                <span class="feature-tag">Timing Control</span>
+                                <span class="feature-tag">Notification Settings</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="settings" class="settings-preview">
+            <div class="container">
+                <h2 class="section-title">Settings Preview</h2>
+                <div class="settings-showcase">
+                    <div class="settings-tabs">
+                        <button class="tab-button active" data-tab="hotkey">Hotkey</button>
+                        <button class="tab-button" data-tab="timing">Timing</button>
+                        <button class="tab-button" data-tab="general">General</button>
+                    </div>
+                    <div class="tab-content">
+                        <div class="settings-demo" id="hotkey-demo">
+                            <h4>Current Hotkey</h4>
+                            <div class="hotkey-display">Ctrl + F12</div>
+                            <button class="btn btn-small">Change Hotkey</button>
+                        </div>
+                        <div class="settings-demo hidden" id="timing-demo">
+                            <h4>Timing Configuration</h4>
+                            <div class="timing-controls">
+                                <div class="timing-control">
+                                    <label>Minimum Interval</label>
+                                    <input type="number" value="3" min="1" max="60"> minutes
+                                </div>
+                                <div class="timing-control">
+                                    <label>Maximum Interval</label>
+                                    <input type="number" value="8" min="1" max="120"> minutes
+                                </div>
+                            </div>
+                        </div>
+                        <div class="settings-demo hidden" id="general-demo">
+                            <h4>General Options</h4>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" checked> Start minimized to tray
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" checked> Show notifications
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="support" class="support">
+            <div class="container">
+                <h2 class="section-title">Support & Links</h2>
+                <div class="support-grid">
+                    <div class="support-card">
+                        <div class="support-icon">📥</div>
+                        <h3>Downloads</h3>
+                        <p>Get the latest releases and pre-built binaries</p>
+                        <a href="https://github.com/YOUR_USERNAME/YOUR_REPO/releases" class="btn btn-primary" target="_blank" rel="noopener">View Releases</a>
+                    </div>
+                    <div class="support-card">
+                        <div class="support-icon">🐛</div>
+                        <h3>Issues</h3>
+                        <p>Report bugs or request new features</p>
+                        <a href="https://github.com/YOUR_USERNAME/YOUR_REPO/issues" class="btn btn-secondary" target="_blank">Report Issue</a>
+                    </div>
+                    <div class="support-card">
+                        <div class="support-icon">📖</div>
+                        <h3>Documentation</h3>
+                        <p>Complete setup and usage guide</p>
+                        <a href="https://github.com/YOUR_USERNAME/YOUR_REPO#readme" class="btn btn-outline" target="_blank">Read Docs</a>
+                    </div>
+                    <div class="support-card">
+                        <div class="support-icon">⭐</div>
+                        <h3>Source Code</h3>
+                        <p>View and contribute to the project</p>
+                        <a href="https://github.com/YOUR_USERNAME/YOUR_REPO" class="btn btn-primary" target="_blank">View Source</a>
+                    </div>
+                </div>
+
+                <div class="support-info">
+                    <h3>Need Help?</h3>
+                    <p>If you encounter any issues or need assistance:</p>
+                    <div class="help-options">
+                        <div class="help-option">
+                            <strong>Check the Wiki:</strong> Detailed troubleshooting guide
+                        </div>
+                        <div class="help-option">
+                            <strong>Open an Issue:</strong> Bug reports and feature requests welcome
+                        </div>
+                        <div class="help-option">
+                            <strong>Discord:</strong> Join our community for real-time support
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Project</h4>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#installation">Installation</a></li>
+                        <li><a href="#settings">Settings</a></li>
+                        <li><a href="#support">Support</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="https://github.com/YOUR_USERNAME/YOUR_REPO/releases" rel="noopener">Releases</a></li>
+                        <li><a href="https://github.com/YOUR_USERNAME/YOUR_REPO/issues" rel="noopener">Issues</a></li>
+                        <li><a href="https://github.com/YOUR_USERNAME/YOUR_REPO/wiki" rel="noopener">Wiki</a></li>
+                        <li><a href="https://github.com/YOUR_USERNAME/YOUR_REPO/discussions" rel="noopener">Discussions</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Community</h4>
+                    <ul>
+                        <li><a href="https://github.com/YOUR_USERNAME/YOUR_REPO/stargazers" rel="noopener">⭐ Star</a></li>
+                        <li><a href="https://github.com/YOUR_USERNAME/YOUR_REPO/fork" rel="noopener">🍴 Fork</a></li>
+                        <li><a href="https://github.com/YOUR_USERNAME/YOUR_REPO/watchers" rel="noopener">👁️ Watch</a></li>
+                        <li><a href="https://github.com/YOUR_USERNAME/YOUR_REPO/graphs/contributors" rel="noopener">👥 Contributors</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 New World AFK Preventer. Built with ❤️ for the New World community.</p>
+                <p class="footer-disclaimer">This tool is for educational purposes only. Use responsibly and in accordance with game terms of service.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
