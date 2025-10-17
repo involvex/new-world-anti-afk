@@ -1,6 +1,7 @@
 {
   "name": "newworld-afk-preventer-docs",
   "version": "1.0.0",
+  "author": "involvex",
   "description": "Documentation site for New World AFK Preventer",
   "scripts": {
     "dev": "vite",
