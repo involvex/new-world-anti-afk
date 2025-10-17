@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyCopyrightAttribute("Copyright © 2024")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c352e1addfd4724b548ce913758b10c88d9c05be")]
 [assembly: System.Reflection.AssemblyProductAttribute("New World AFK Preventer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("New World AFK Preventer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

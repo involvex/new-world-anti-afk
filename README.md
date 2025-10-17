@@ -7,10 +7,10 @@ A smart AFK prevention tool for New World that sends random key presses to preve
 - **Smart Key Algorithm**: Sends random movement keys (WASD, Space) at random intervals (3-8 minutes)
 - **Configurable Hotkey**: Customize your own hotkey combination with hotkey recording
 - **Window Detection**: Automatically detects if New World is running and visible
-- **Tray Icon**: Minimizes to system tray with status indicator and menu options
+- **Tray Icon**: Minimizes to system tray with custom icon and menu options
 - **Settings System**: Full settings management with JSON storage
 - **Auto-Stop**: Automatically stops if New World window is closed or minimized
-- **Custom Icon Support**: Add your own tray icon (app.ico)
+- **Bundled Icon**: Custom application icon automatically included in builds
 
 ## Requirements
 
@@ -120,7 +120,7 @@ All settings are automatically saved to `settings.json` and persist between sess
 ├── create-icon.bat            # Icon creation helper
 ├── fokusnewworldscreenshot.ps1 # Legacy PowerShell script
 ├── settings.json              # Settings file (created automatically)
-├── app.ico                    # Custom tray icon (optional)
+├── app.ico                    # Custom tray icon (bundled with application)
 └── README.md                  # This file
 ```
 
@@ -147,6 +147,11 @@ Feel free to improve the algorithm, add features, or fix issues:
 5. Submit a pull request
 
 ## Changelog
+
+### v1.2.0
+- **Bundled Icon**: Custom app.ico now automatically included in all builds
+- **Enhanced Icon System**: Application uses custom icon from executable resources
+- **Improved Build Process**: Icon is copied to output directory automatically
 
 ### v1.1.0
 - **Settings System**: Complete settings management with JSON storage

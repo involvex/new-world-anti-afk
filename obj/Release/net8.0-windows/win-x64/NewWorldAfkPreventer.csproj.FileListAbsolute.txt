@@ -12,3 +12,5 @@ D:\repos\new-world-anti-afk\obj\Release\net8.0-windows\win-x64\refint\NewWorldAf
 D:\repos\new-world-anti-afk\obj\Release\net8.0-windows\win-x64\NewWorldAfkPreventer.pdb
 D:\repos\new-world-anti-afk\obj\Release\net8.0-windows\win-x64\NewWorldAfkPreventer.genruntimeconfig.cache
 D:\repos\new-world-anti-afk\obj\Release\net8.0-windows\win-x64\ref\NewWorldAfkPreventer.dll
+D:\repos\new-world-anti-afk\obj\Release\net8.0-windows\win-x64\NewWorldAfkPreventer.sourcelink.json
+D:\repos\new-world-anti-afk\bin\Release\net8.0-windows\win-x64\app.ico

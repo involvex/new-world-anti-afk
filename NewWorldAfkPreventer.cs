@@ -82,17 +82,10 @@ namespace NewWorldAfkPreventer
         {
             trayIcon = new NotifyIcon(this.components);
 
-            // Try to load custom icon, fall back to system icon
+            // Use the application's icon for the tray
             try
             {
-                if (File.Exists("app.ico"))
-                {
-                    trayIcon.Icon = new Icon("app.ico");
-                }
-                else
-                {
-                    trayIcon.Icon = System.Drawing.SystemIcons.Application;
-                }
+                trayIcon.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             }
             catch
             {

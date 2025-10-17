@@ -5,7 +5,7 @@
     <TargetFramework>net8.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
-    <ApplicationIcon />
+    <ApplicationIcon>app.ico</ApplicationIcon>
     <AssemblyTitle>New World AFK Preventer</AssemblyTitle>
     <AssemblyDescription>A tool to prevent AFK kicks in New World using smart key presses</AssemblyDescription>
     <AssemblyCompany>AFK Preventer</AssemblyCompany>
@@ -17,5 +17,9 @@
     <SelfContained>false</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="app.ico" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 
 </Project>
