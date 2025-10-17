@@ -1,0 +1,14 @@
+D:\repos\new-world-anti-afk\bin\Debug\net8.0-windows\win-x64\NewWorldAfkPreventer.exe
+D:\repos\new-world-anti-afk\bin\Debug\net8.0-windows\win-x64\NewWorldAfkPreventer.deps.json
+D:\repos\new-world-anti-afk\bin\Debug\net8.0-windows\win-x64\NewWorldAfkPreventer.runtimeconfig.json
+D:\repos\new-world-anti-afk\bin\Debug\net8.0-windows\win-x64\NewWorldAfkPreventer.dll
+D:\repos\new-world-anti-afk\bin\Debug\net8.0-windows\win-x64\NewWorldAfkPreventer.pdb
+D:\repos\new-world-anti-afk\obj\Debug\net8.0-windows\win-x64\NewWorldAfkPreventer.GeneratedMSBuildEditorConfig.editorconfig
+D:\repos\new-world-anti-afk\obj\Debug\net8.0-windows\win-x64\NewWorldAfkPreventer.AssemblyInfoInputs.cache
+D:\repos\new-world-anti-afk\obj\Debug\net8.0-windows\win-x64\NewWorldAfkPreventer.AssemblyInfo.cs
+D:\repos\new-world-anti-afk\obj\Debug\net8.0-windows\win-x64\NewWorldAfkPreventer.csproj.CoreCompileInputs.cache
+D:\repos\new-world-anti-afk\obj\Debug\net8.0-windows\win-x64\NewWorldAfkPreventer.dll
+D:\repos\new-world-anti-afk\obj\Debug\net8.0-windows\win-x64\refint\NewWorldAfkPreventer.dll
+D:\repos\new-world-anti-afk\obj\Debug\net8.0-windows\win-x64\NewWorldAfkPreventer.pdb
+D:\repos\new-world-anti-afk\obj\Debug\net8.0-windows\win-x64\NewWorldAfkPreventer.genruntimeconfig.cache
+D:\repos\new-world-anti-afk\obj\Debug\net8.0-windows\win-x64\ref\NewWorldAfkPreventer.dll
