@@ -1,0 +1,344 @@
+﻿using System;
+using System.Windows.Forms;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+
+namespace NewWorldAfkPreventer
+{
+    public class AfkPreventer : Form
+    {
+        private NotifyIcon? trayIcon;
+        private System.ComponentModel.IContainer? components;
+        private bool isRunning = false;
+        private System.Windows.Forms.Timer? timer;
+        private Random random = new Random();
+        private AppSettings settings = AppSettings.Load();
+
+        // Win32 API constants and imports
+        private const uint WM_HOTKEY = 0x0312;
+
+        [DllImport("user32.dll")]
+        private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
+
+        [DllImport("user32.dll")]
+        private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+        [DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
+
+        [DllImport("user32.dll")]
+        private static extern int GetWindowText(IntPtr hWnd, System.Text.StringBuilder text, int count);
+
+        [DllImport("user32.dll")]
+        private static extern bool IsWindowVisible(IntPtr hWnd);
+
+        private const int KEYEVENTF_KEYUP = 0x0002;
+        private const byte VK_W = 0x57;
+        private const byte VK_A = 0x41;
+        private const byte VK_S = 0x53;
+        private const byte VK_D = 0x44;
+        private const byte VK_SPACE = 0x20;
+
+        public AfkPreventer()
+        {
+            InitializeComponent();
+            SetupTrayIcon();
+            // Register hotkey after tray icon exists so we can show notifications on failure
+            bool reg = RegisterHotkey();
+            UpdateTrayHotkeyStatus(reg);
+
+            // Apply start minimized setting removed per user request — show UI on start
+            // Previously the app started minimized to tray; now we show the main UI by default.
+        }
+
+        private void InitializeComponent()
+        {
+            this.components = new System.ComponentModel.Container();
+            this.timer = new System.Windows.Forms.Timer(this.components);
+            if (this.timer != null)
+            {
+                this.timer.Interval = GetRandomInterval();
+                this.timer.Tick += Timer_Tick;
+            }
+
+            // Show UI on start instead of hiding to tray
+            this.WindowState = FormWindowState.Normal;
+            this.ShowInTaskbar = true;
+            this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.Size = new System.Drawing.Size(600, 400);
+        }
+
+        private void SetupTrayIcon()
+        {
+            trayIcon = new NotifyIcon(this.components);
+
+            // Use the application's icon for the tray
+            try
+            {
+                trayIcon.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            }
+            catch
+            {
+                trayIcon.Icon = System.Drawing.SystemIcons.Application;
+            }
+
+            trayIcon.Text = "New World AFK Preventer";
+            trayIcon.Visible = true;
+
+            ContextMenuStrip trayMenu = new ContextMenuStrip();
+            trayMenu.Items.Add("Toggle AFK Prevention", null, OnToggleAfkPrevention);
+            trayMenu.Items.Add("Settings", null, OnSettings);
+            trayMenu.Items.Add("-");
+            trayMenu.Items.Add("Exit", null, OnExit);
+
+            trayIcon.ContextMenuStrip = trayMenu;
+            trayIcon.DoubleClick += OnToggleAfkPrevention;
+        }
+
+        // Modified RegisterHotkey to return success and report conflicts
+        private bool RegisterHotkey()
+        {
+            uint modifiers = 0;
+            if (settings.HotkeyModifier.HasFlag(Keys.Control)) modifiers |= 0x0002; // MOD_CONTROL
+            if (settings.HotkeyModifier.HasFlag(Keys.Alt)) modifiers |= 0x0001; // MOD_ALT
+            if (settings.HotkeyModifier.HasFlag(Keys.Shift)) modifiers |= 0x0004; // MOD_SHIFT
+
+            uint virtualKey = (uint)settings.Hotkey;
+            bool result = false;
+            try
+            {
+                result = RegisterHotKey(this.Handle, 0, modifiers, virtualKey);
+            }
+            catch { result = false; }
+
+            if (!result)
+            {
+                // Show a message box and tray notification if registration failed
+                try
+                {
+                    MessageBox.Show($"Failed to register hotkey {settings.HotkeyModifier} + {settings.Hotkey}. It may be in use by another application.", "Hotkey Registration", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                catch { }
+
+                if (trayIcon != null)
+                {
+                    trayIcon.ShowBalloonTip(5000, "Hotkey registration failed", "The configured hotkey could not be registered (possibly in use).", ToolTipIcon.Warning);
+                }
+            }
+
+            return result;
+        }
+
+        // Update tray tooltip text to include current hotkey and registration status
+        private void UpdateTrayHotkeyStatus(bool registered)
+        {
+            if (trayIcon == null) return;
+
+            string running = isRunning ? "Running" : "Stopped";
+            string hotkeyText = $"{settings.HotkeyModifier} + {settings.Hotkey}";
+            string regText = registered ? "Registered" : "Not registered";
+
+            string text = $"New World AFK Preventer - {running} - Hotkey: {hotkeyText} ({regText})";
+
+            // Tray tooltip max length is limited; ensure not to exceed it
+            if (text.Length > 63) text = text.Substring(0, 63);
+
+            trayIcon.Text = text;
+        }
+
+        // New public method to re-register hotkey and update timer if needed
+        public void ReRegisterHotkey()
+        {
+            try
+            {
+                UnregisterHotKey(this.Handle, 0);
+            }
+            catch { }
+
+            bool reg = RegisterHotkey();
+
+            if (isRunning && timer != null)
+            {
+                timer.Interval = GetRandomInterval();
+            }
+
+            UpdateTrayHotkeyStatus(reg);
+        }
+
+        private int GetRandomInterval()
+        {
+            return random.Next(settings.MinInterval, settings.MaxInterval);
+        }
+
+        private void ShowNotification(string message)
+        {
+            if (settings.ShowNotifications && trayIcon != null)
+            {
+                trayIcon.ShowBalloonTip(3000, "New World AFK Preventer", message, ToolTipIcon.Info);
+            }
+        }
+
+        private void OnSettings(object sender, EventArgs e)
+        {
+            using (SettingsForm settingsForm = new SettingsForm(settings))
+            {
+                if (settingsForm.ShowDialog() == DialogResult.OK)
+                {
+                    // Reload settings
+                    settings = AppSettings.Load();
+
+                    // Re-register hotkey with new settings
+                    ReRegisterHotkey();
+
+                    // Update timer interval if running
+                    if (isRunning && timer != null)
+                    {
+                        timer.Interval = GetRandomInterval();
+                    }
+                }
+            }
+        }
+
+        private bool IsNewWorldRunning()
+        {
+            Process[] processes = Process.GetProcessesByName("NewWorld");
+            if (processes.Length == 0) return false;
+
+            IntPtr hwnd = processes[0].MainWindowHandle;
+            return hwnd != IntPtr.Zero && IsWindowVisible(hwnd);
+        }
+
+        private void SendKeyPress(byte key)
+        {
+            Process[] processes = Process.GetProcessesByName("NewWorld");
+            if (processes.Length == 0) return;
+
+            IntPtr hwnd = processes[0].MainWindowHandle;
+            if (hwnd != IntPtr.Zero)
+            {
+                SetForegroundWindow(hwnd);
+                Thread.Sleep(100);
+
+                keybd_event(key, 0, 0, UIntPtr.Zero);
+                Thread.Sleep(50);
+                keybd_event(key, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
+            }
+        }
+
+        private void SendSmartKeyPress()
+        {
+            byte[] keys = { VK_W, VK_A, VK_S, VK_D, VK_SPACE };
+            byte randomKey = keys[random.Next(keys.Length)];
+            SendKeyPress(randomKey);
+        }
+
+        public void Timer_Tick(object? sender, EventArgs e)
+        {
+            if (isRunning && IsNewWorldRunning())
+            {
+                SendSmartKeyPress();
+                if (timer != null)
+                {
+                    timer.Interval = GetRandomInterval();
+                }
+            }
+            else if (isRunning && !IsNewWorldRunning())
+            {
+                StopAfkPrevention();
+            }
+        }
+
+        private void StartAfkPrevention()
+        {
+            if (isRunning) return;
+
+            if (!IsNewWorldRunning())
+            {
+                ShowNotification("New World not detected. Please make sure New World is running and visible.");
+                return;
+            }
+
+            isRunning = true;
+            if (timer != null)
+            {
+                timer.Start();
+            }
+            ShowNotification("AFK prevention started");
+            UpdateTrayText();
+        }
+
+        private void StopAfkPrevention()
+        {
+            if (!isRunning) return;
+
+            isRunning = false;
+            if (timer != null)
+            {
+                timer.Stop();
+            }
+            ShowNotification("AFK prevention stopped");
+            UpdateTrayText();
+        }
+
+        private void ToggleAfkPrevention()
+        {
+            if (isRunning)
+                StopAfkPrevention();
+            else
+                StartAfkPrevention();
+        }
+
+        private void UpdateTrayText()
+        {
+            if (trayIcon != null)
+            {
+                trayIcon.Text = $"New World AFK Preventer - {(isRunning ? "Running" : "Stopped")}";
+            }
+        }
+
+        private void OnToggleAfkPrevention(object sender, EventArgs e)
+        {
+            ToggleAfkPrevention();
+        }
+
+        private void OnExit(object sender, EventArgs e)
+        {
+            StopAfkPrevention();
+            UnregisterHotKey(this.Handle, 0);
+            if (trayIcon != null)
+            {
+                trayIcon.Dispose();
+            }
+            Application.Exit();
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            if (m.Msg == WM_HOTKEY && (int)m.WParam == 0)
+            {
+                ToggleAfkPrevention();
+                return;
+            }
+            base.WndProc(ref m);
+        }
+
+        [STAThread]
+        static void Main()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new AfkPreventer());
+        }
+
+        public bool IsRunning { get => isRunning; set => isRunning = value; }
+    }
+}

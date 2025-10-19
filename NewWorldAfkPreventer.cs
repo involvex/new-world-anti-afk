@@ -51,14 +51,24 @@ namespace NewWorldAfkPreventer
         public AfkPreventer()
         {
             InitializeComponent();
-            RegisterHotkey();
             SetupTrayIcon();
+            bool reg = RegisterHotkey();
+            UpdateTrayHotkeyStatus(reg);
 
-            // Apply start minimized setting
-            if (settings.StartMinimized)
+            // TopMost aus Settings übernehmen
+            this.TopMost = settings.AlwaysOnTop;
+
+            this.WindowState = FormWindowState.Minimized;
+            this.ShowInTaskbar = false;
+
+            using (SettingsForm settingsForm = new SettingsForm(settings))
             {
-                this.WindowState = FormWindowState.Minimized;
-                this.ShowInTaskbar = false;
+                if (settingsForm.ShowDialog() == DialogResult.OK)
+                {
+                    settings = AppSettings.Load();
+                    this.TopMost = settings.AlwaysOnTop; // Nach Settings-Dialog übernehmen
+                    ReRegisterHotkey();
+                }
             }
         }
 
@@ -72,10 +82,14 @@ namespace NewWorldAfkPreventer
                 this.timer.Tick += Timer_Tick;
             }
 
+            // Set form properties for minimized start
             this.WindowState = FormWindowState.Minimized;
             this.ShowInTaskbar = false;
-            this.FormBorderStyle = FormBorderStyle.None;
-            this.Size = new System.Drawing.Size(1, 1);
+            this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.Size = new System.Drawing.Size(600, 400);
+
+            // Hide form from alt-tab
+            this.ShowInTaskbar = false;
         }
 
         private void SetupTrayIcon()
@@ -105,15 +119,134 @@ namespace NewWorldAfkPreventer
             trayIcon.DoubleClick += OnToggleAfkPrevention;
         }
 
-        private void RegisterHotkey()
+        // Helper: convert Keys modifier flags to Win32 modifier mask
+        private uint ModifiersFromKeys(Keys modifiers)
         {
-            uint modifiers = 0;
-            if (settings.HotkeyModifier.HasFlag(Keys.Control)) modifiers |= 0x0002; // MOD_CONTROL
-            if (settings.HotkeyModifier.HasFlag(Keys.Alt)) modifiers |= 0x0001; // MOD_ALT
-            if (settings.HotkeyModifier.HasFlag(Keys.Shift)) modifiers |= 0x0004; // MOD_SHIFT
+            uint mask = 0;
+            if (modifiers.HasFlag(Keys.Control)) mask |= 0x0002; // MOD_CONTROL
+            if (modifiers.HasFlag(Keys.Alt)) mask |= 0x0001; // MOD_ALT
+            if (modifiers.HasFlag(Keys.Shift)) mask |= 0x0004; // MOD_SHIFT
+            return mask;
+        }
 
-            uint virtualKey = (uint)settings.Hotkey;
-            RegisterHotKey(this.Handle, 0, modifiers, virtualKey);
+        // Try a single registration attempt
+        private bool TryRegisterCombination(Keys key, Keys modifier)
+        {
+            uint modifiers = ModifiersFromKeys(modifier);
+            try
+            {
+                return RegisterHotKey(this.Handle, 0, modifiers, (uint)key);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        // Modified RegisterHotkey to return success, notify, and try alternatives if needed
+        private bool RegisterHotkey()
+        {
+            Keys originalKey = settings.Hotkey;
+            Keys originalModifier = settings.HotkeyModifier;
+
+            // Try original combination first
+            if (TryRegisterCombination(originalKey, originalModifier))
+            {
+                trayIcon?.ShowBalloonTip(3000, "Hotkey registered", $"Hotkey registered: {originalModifier} + {originalKey}", ToolTipIcon.Info);
+                return true;
+            }
+
+            // Define modifier alternatives (try less/more modifiers)
+            Keys[] modifierAlternatives = new Keys[]
+            {
+                originalModifier, // already tried
+                Keys.Control | Keys.Alt | Keys.Shift,
+                Keys.Control | Keys.Alt,
+                Keys.Control | Keys.Shift,
+                Keys.Alt | Keys.Shift,
+                Keys.Control,
+                Keys.Alt,
+                Keys.Shift,
+                Keys.None
+            };
+
+            // Try same key with different modifier combos
+            foreach (var mod in modifierAlternatives)
+            {
+                if (mod == originalModifier) continue; // skip, already tried
+                if (TryRegisterCombination(originalKey, mod))
+                {
+                    settings.Hotkey = originalKey;
+                    settings.HotkeyModifier = mod;
+                    settings.Save();
+                    trayIcon?.ShowBalloonTip(4000, "Hotkey registered (alternative)", $"Using alternative hotkey: {mod} + {originalKey}", ToolTipIcon.Info);
+                    return true;
+                }
+            }
+
+            // If still not registered, try fallback keys with modifier alternatives
+            Keys[] fallbackKeys = new Keys[] { Keys.F12, Keys.F11, Keys.F10, Keys.F9, Keys.F8 };
+
+            foreach (var fk in fallbackKeys)
+            {
+                foreach (var mod in modifierAlternatives)
+                {
+                    if (TryRegisterCombination(fk, mod))
+                    {
+                        settings.Hotkey = fk;
+                        settings.HotkeyModifier = mod;
+                        settings.Save();
+                        trayIcon?.ShowBalloonTip(4000, "Hotkey registered (fallback)", $"Using fallback hotkey: {mod} + {fk}", ToolTipIcon.Info);
+                        return true;
+                    }
+                }
+            }
+
+            // All attempts failed
+            try
+            {
+                MessageBox.Show($"Failed to register hotkey {originalModifier} + {originalKey}. No alternative keys available.", "Hotkey Registration", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch { }
+
+            trayIcon?.ShowBalloonTip(4000, "Hotkey registration failed", "The configured hotkey could not be registered and no alternative was found.", ToolTipIcon.Warning);
+            return false;
+        }
+
+        // Update tray tooltip text to include current hotkey and registration status
+        private void UpdateTrayHotkeyStatus(bool registered)
+        {
+            if (trayIcon == null) return;
+
+            string running = isRunning ? "Running" : "Stopped";
+            string hotkeyText = $"{settings.HotkeyModifier} + {settings.Hotkey}";
+            string regText = registered ? "Registered" : "Not registered";
+
+            string text = $"New World AFK Preventer - {running} - Hotkey: {hotkeyText} ({regText})";
+
+            // Tray tooltip max length is limited; ensure not to exceed it
+            if (text.Length > 63) text = text.Substring(0, 63);
+
+            trayIcon.Text = text;
+        }
+
+        // New public method to re-register hotkey and update timer if needed
+        public void ReRegisterHotkey()
+        {
+            try
+            {
+                UnregisterHotKey(this.Handle, 0);
+            }
+            catch { }
+
+            bool reg = RegisterHotkey();
+
+            if (isRunning && timer != null)
+            {
+                timer.Interval = GetRandomInterval();
+            }
+
+            UpdateTrayHotkeyStatus(reg);
         }
 
         private int GetRandomInterval()
@@ -137,10 +270,8 @@ namespace NewWorldAfkPreventer
                 {
                     // Reload settings
                     settings = AppSettings.Load();
-
-                    // Re-register hotkey with new settings
-                    UnregisterHotKey(this.Handle, 0);
-                    RegisterHotkey();
+                    this.TopMost = settings.AlwaysOnTop; // Nach Settings-Dialog übernehmen
+                    ReRegisterHotkey();
 
                     // Update timer interval if running
                     if (isRunning && timer != null)
@@ -184,7 +315,7 @@ namespace NewWorldAfkPreventer
             SendKeyPress(randomKey);
         }
 
-        private void Timer_Tick(object? sender, EventArgs e)
+        public void Timer_Tick(object? sender, EventArgs e)
         {
             if (isRunning && IsNewWorldRunning())
             {
@@ -281,5 +412,7 @@ namespace NewWorldAfkPreventer
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new AfkPreventer());
         }
+
+        public bool IsRunning { get => isRunning; set => isRunning = value; }
     }
 }

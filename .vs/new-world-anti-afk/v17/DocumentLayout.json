@@ -1,0 +1,202 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\repos\\new-world-anti-afk\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{34EB6878-697B-7909-151A-EDD08A85A72B}|NewWorldAfkPreventer.csproj|d:\\repos\\new-world-anti-afk\\build-porteable.bat||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{34EB6878-697B-7909-151A-EDD08A85A72B}|NewWorldAfkPreventer.csproj|solutionrelative:build-porteable.bat||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34EB6878-697B-7909-151A-EDD08A85A72B}|NewWorldAfkPreventer.csproj|d:\\repos\\new-world-anti-afk\\newworldafkpreventer.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{34EB6878-697B-7909-151A-EDD08A85A72B}|NewWorldAfkPreventer.csproj|solutionrelative:newworldafkpreventer.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34EB6878-697B-7909-151A-EDD08A85A72B}|NewWorldAfkPreventer.csproj|d:\\repos\\new-world-anti-afk\\newworldafkpreventer.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
+      "RelativeMoniker": "D:0:0:{34EB6878-697B-7909-151A-EDD08A85A72B}|NewWorldAfkPreventer.csproj|solutionrelative:newworldafkpreventer.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34EB6878-697B-7909-151A-EDD08A85A72B}|NewWorldAfkPreventer.csproj|d:\\repos\\new-world-anti-afk\\settingsform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{34EB6878-697B-7909-151A-EDD08A85A72B}|NewWorldAfkPreventer.csproj|solutionrelative:settingsform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34EB6878-697B-7909-151A-EDD08A85A72B}|NewWorldAfkPreventer.csproj|d:\\repos\\new-world-anti-afk\\newworldafkpreventer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{34EB6878-697B-7909-151A-EDD08A85A72B}|NewWorldAfkPreventer.csproj|solutionrelative:newworldafkpreventer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34EB6878-697B-7909-151A-EDD08A85A72B}|NewWorldAfkPreventer.csproj|d:\\repos\\new-world-anti-afk\\settings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{34EB6878-697B-7909-151A-EDD08A85A72B}|NewWorldAfkPreventer.csproj|solutionrelative:settings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34EB6878-697B-7909-151A-EDD08A85A72B}|NewWorldAfkPreventer.csproj|d:\\repos\\new-world-anti-afk\\settingsform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{34EB6878-697B-7909-151A-EDD08A85A72B}|NewWorldAfkPreventer.csproj|solutionrelative:settingsform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34EB6878-697B-7909-151A-EDD08A85A72B}|NewWorldAfkPreventer.csproj|d:\\repos\\new-world-anti-afk\\settingsform.resx||{81828910-B8B3-4D2B-99A3-067027C180C1}",
+      "RelativeMoniker": "D:0:0:{34EB6878-697B-7909-151A-EDD08A85A72B}|NewWorldAfkPreventer.csproj|solutionrelative:settingsform.resx||{81828910-B8B3-4D2B-99A3-067027C180C1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34EB6878-697B-7909-151A-EDD08A85A72B}|NewWorldAfkPreventer.csproj|d:\\repos\\new-world-anti-afk\\app.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{34EB6878-697B-7909-151A-EDD08A85A72B}|NewWorldAfkPreventer.csproj|solutionrelative:app.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34EB6878-697B-7909-151A-EDD08A85A72B}|NewWorldAfkPreventer.csproj|D:\\repos\\new-world-anti-afk\\properties\\settings.settings||{6D2695F9-5365-4A78-89ED-F205C045BFE6}",
+      "RelativeMoniker": "D:0:0:{34EB6878-697B-7909-151A-EDD08A85A72B}|NewWorldAfkPreventer.csproj|solutionrelative:properties\\settings.settings||{6D2695F9-5365-4A78-89ED-F205C045BFE6}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34EB6878-697B-7909-151A-EDD08A85A72B}|NewWorldAfkPreventer.csproj|d:\\repos\\new-world-anti-afk\\properties\\resources.resx||{81828910-B8B3-4D2B-99A3-067027C180C1}",
+      "RelativeMoniker": "D:0:0:{34EB6878-697B-7909-151A-EDD08A85A72B}|NewWorldAfkPreventer.csproj|solutionrelative:properties\\resources.resx||{81828910-B8B3-4D2B-99A3-067027C180C1}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "build-porteable.bat",
+              "DocumentMoniker": "D:\\repos\\new-world-anti-afk\\build-porteable.bat",
+              "RelativeDocumentMoniker": "build-porteable.bat",
+              "ToolTip": "D:\\repos\\new-world-anti-afk\\build-porteable.bat",
+              "RelativeToolTip": "build-porteable.bat",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAFAAAAAAAAAA==",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAE8SURBVDhPvZJNSwJRGIWfmcaQiH6DEdEHFBEFBe6KoKKoTf8iAlOmgdbipqBf0rKICAuDkj4WERgulL5o06gLx9S53lZJzrVQgh54uXDOuefdvPAXpJReqW00y4xkQAa8RmtoWb2dz4tLKw0vyACWGZaVSkWZ48SVPDpLKvr3scyw1BtWAPfpLIenl9i5PO92jv2DODd3KW\u002BsjlJg6DqOU2JidIjJsWGckoNhKLE6iuMKQbVaQdQENSFwq1VcV3hjdZSCcrmMBsTPk5wkLtA0SF7f4pQ\u002BvFFoVjA\u002BMsja8hw93V0IV/D69sLj8xOx3T1SD2lvXC34YnVhlvmZIIV8gei2Sd628fs7vbGfCwCKRQdDh/VQBJ\u002Bvo\u002Bnl/low0N/HVmiD4PQUO7EovQH15jTL3MyApjotIbNe5f/5BEiOoURWS5r0AAAAAElFTkSuQmCC",
+              "WhenOpened": "2025-10-19T10:16:54.524Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "NewWorldAfkPreventer",
+              "DocumentMoniker": "D:\\repos\\new-world-anti-afk\\NewWorldAfkPreventer.csproj",
+              "RelativeDocumentMoniker": "NewWorldAfkPreventer.csproj",
+              "ToolTip": "D:\\repos\\new-world-anti-afk\\NewWorldAfkPreventer.csproj",
+              "RelativeToolTip": "NewWorldAfkPreventer.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAlwAoAAAA0AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-10-19T09:09:54.331Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "SettingsForm.cs",
+              "DocumentMoniker": "D:\\repos\\new-world-anti-afk\\SettingsForm.cs",
+              "RelativeDocumentMoniker": "SettingsForm.cs",
+              "ToolTip": "D:\\repos\\new-world-anti-afk\\SettingsForm.cs",
+              "RelativeToolTip": "SettingsForm.cs",
+              "ViewState": "AgIAAFwBAAAAAAAAAAAswF4BAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-19T07:14:07.584Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "App.config",
+              "DocumentMoniker": "D:\\repos\\new-world-anti-afk\\App.config",
+              "RelativeDocumentMoniker": "App.config",
+              "ToolTip": "D:\\repos\\new-world-anti-afk\\App.config",
+              "RelativeToolTip": "App.config",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000601|",
+              "WhenOpened": "2025-10-19T07:09:40.428Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "NewWorldAfkPreventer",
+              "DocumentMoniker": "D:\\repos\\new-world-anti-afk\\NewWorldAfkPreventer.csproj",
+              "RelativeDocumentMoniker": "NewWorldAfkPreventer.csproj",
+              "ToolTip": "D:\\repos\\new-world-anti-afk\\NewWorldAfkPreventer.csproj",
+              "RelativeToolTip": "NewWorldAfkPreventer.csproj",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-10-19T06:26:47.603Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Settings.cs",
+              "DocumentMoniker": "D:\\repos\\new-world-anti-afk\\Settings.cs",
+              "RelativeDocumentMoniker": "Settings.cs",
+              "ToolTip": "D:\\repos\\new-world-anti-afk\\Settings.cs",
+              "RelativeToolTip": "Settings.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvw8AAAA2AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-19T08:55:32.959Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "NewWorldAfkPreventer.cs",
+              "DocumentMoniker": "D:\\repos\\new-world-anti-afk\\NewWorldAfkPreventer.cs",
+              "RelativeDocumentMoniker": "NewWorldAfkPreventer.cs",
+              "ToolTip": "D:\\repos\\new-world-anti-afk\\NewWorldAfkPreventer.cs",
+              "RelativeToolTip": "NewWorldAfkPreventer.cs",
+              "ViewState": "AgIAACEAAAAAAAAAAAAuwHYAAAA6AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-19T07:59:28.116Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "SettingsForm.cs [Entwurf]",
+              "DocumentMoniker": "D:\\repos\\new-world-anti-afk\\SettingsForm.cs",
+              "RelativeDocumentMoniker": "SettingsForm.cs",
+              "ToolTip": "D:\\repos\\new-world-anti-afk\\SettingsForm.cs [Entwurf]",
+              "RelativeToolTip": "SettingsForm.cs [Entwurf]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-19T07:09:51.27Z",
+              "EditorCaption": " [Entwurf]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "SettingsForm.resx",
+              "DocumentMoniker": "D:\\repos\\new-world-anti-afk\\SettingsForm.resx",
+              "RelativeDocumentMoniker": "SettingsForm.resx",
+              "ToolTip": "D:\\repos\\new-world-anti-afk\\SettingsForm.resx",
+              "RelativeToolTip": "SettingsForm.resx",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001005|",
+              "WhenOpened": "2025-10-19T07:14:05.073Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Settings.settings",
+              "DocumentMoniker": "D:\\repos\\new-world-anti-afk\\Properties\\Settings.settings",
+              "RelativeDocumentMoniker": "Properties\\Settings.settings",
+              "ToolTip": "D:\\repos\\new-world-anti-afk\\Properties\\Settings.settings",
+              "RelativeToolTip": "Properties\\Settings.settings",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002767|",
+              "WhenOpened": "2025-10-19T06:32:23.601Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "Resources.resx",
+              "DocumentMoniker": "D:\\repos\\new-world-anti-afk\\Properties\\Resources.resx",
+              "RelativeDocumentMoniker": "Properties\\Resources.resx",
+              "ToolTip": "D:\\repos\\new-world-anti-afk\\Properties\\Resources.resx",
+              "RelativeToolTip": "Properties\\Resources.resx",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001005|",
+              "WhenOpened": "2025-10-19T06:31:55.503Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

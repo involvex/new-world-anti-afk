@@ -9,17 +9,25 @@ namespace NewWorldAfkPreventer
     {
         public Keys Hotkey { get; set; } = Keys.F12;
         public Keys HotkeyModifier { get; set; } = Keys.Control;
-        public int MinInterval { get; set; } = 180000; // 3 minutes
-        public int MaxInterval { get; set; } = 480000; // 8 minutes
+        public int MinInterval { get; set; } = 180000;
+        public int MaxInterval { get; set; } = 480000;
         public bool StartMinimized { get; set; } = true;
         public bool ShowNotifications { get; set; } = true;
+        public bool AlwaysOnTop { get; set; } = false;
+
+        private static string GetSettingsPath()
+        {
+            string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "NewWorldAfkPreventer");
+            Directory.CreateDirectory(dir);
+            return Path.Combine(dir, "settings.json");
+        }
 
         public void Save()
         {
             try
             {
                 string json = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
-                File.WriteAllText("settings.json", json);
+                File.WriteAllText(GetSettingsPath(), json);
             }
             catch (Exception ex)
             {
@@ -31,9 +39,10 @@ namespace NewWorldAfkPreventer
         {
             try
             {
-                if (File.Exists("settings.json"))
+                string path = GetSettingsPath();
+                if (File.Exists(path))
                 {
-                    string json = File.ReadAllText("settings.json");
+                    string json = File.ReadAllText(path);
                     return JsonSerializer.Deserialize<AppSettings>(json) ?? new AppSettings();
                 }
             }

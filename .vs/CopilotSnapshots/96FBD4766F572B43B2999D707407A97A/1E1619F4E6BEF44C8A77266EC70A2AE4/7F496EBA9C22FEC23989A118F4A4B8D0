@@ -1,0 +1,480 @@
+﻿using System;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Diagnostics;
+using System.Runtime.InteropServices; // Required for DllImport
+using System.Linq;
+
+namespace NewWorldAfkPreventer
+{
+    public class SettingsForm : Form
+    {
+        private AppSettings settings;
+        private TabControl tabControl;
+        private TabPage tabHotkey;
+        private TabPage tabTiming;
+        private TabPage tabGeneral;
+
+        // Hotkey tab controls
+        private Label lblCurrentHotkey;
+        private Button btnChangeHotkey;
+        private Button btnResetHotkey;
+
+        // Timing tab controls
+        private Label lblMinInterval;
+        private NumericUpDown nudMinInterval;
+        private Label lblMaxInterval;
+        private NumericUpDown nudMaxInterval;
+        private Label lblMinutes1;
+        private Label lblMinutes2;
+
+        // General tab controls
+        private CheckBox chkStartMinimized;
+        private CheckBox chkShowNotifications;
+
+        // Common controls
+        private Button btnSave;
+        private TabPage About;
+        private RichTextBox richTextBox1;
+        private StatusStrip statusStrip1;
+        private ToolStripStatusLabel toolStripStatusLabel1;
+        private ToolStripStatusLabel toolStripStatusScript;
+        private ToolStripStatusLabel toolStripStatusNewWorld;
+        private Timer timer1;
+        private System.ComponentModel.IContainer components;
+        private Button btnCancel;
+
+        public SettingsForm(AppSettings settings)
+        {
+            this.settings = settings;
+            InitializeComponent();
+            InitializeTimingTabControls(); // Initialize nudMinInterval and nudMaxInterval
+            SetupHotkeyTab();
+            SetupTimingTab();
+            SetupGeneralTab();
+            LoadSettings();
+        }
+
+        private void InitializeTimingTabControls()
+        {
+            nudMinInterval = new NumericUpDown
+            {
+                Location = new System.Drawing.Point(200, 28),
+                Size = new System.Drawing.Size(80, 20),
+                Minimum = 1,
+                Maximum = 60,
+                Value = 3
+            };
+
+            nudMaxInterval = new NumericUpDown
+            {
+                Location = new System.Drawing.Point(200, 68),
+                Size = new System.Drawing.Size(80, 20),
+                Minimum = 1,
+                Maximum = 120,
+                Value = 8
+            };
+        }
+
+        private void InitializeComponent()
+        {
+            components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsForm));
+            tabControl = new TabControl();
+            tabHotkey = new TabPage();
+            tabTiming = new TabPage();
+            tabGeneral = new TabPage();
+            About = new TabPage();
+            richTextBox1 = new RichTextBox();
+            btnSave = new Button();
+            btnCancel = new Button();
+            statusStrip1 = new StatusStrip();
+            toolStripStatusLabel1 = new ToolStripStatusLabel();
+            toolStripStatusScript = new ToolStripStatusLabel();
+            toolStripStatusNewWorld = new ToolStripStatusLabel();
+            timer1 = new Timer(components);
+            tabControl.SuspendLayout();
+            About.SuspendLayout();
+            statusStrip1.SuspendLayout();
+            SuspendLayout();
+            // 
+            // tabControl
+            // 
+            tabControl.Controls.Add(tabHotkey);
+            tabControl.Controls.Add(tabTiming);
+            tabControl.Controls.Add(tabGeneral);
+            tabControl.Controls.Add(About);
+            tabControl.Location = new Point(0, 0);
+            tabControl.Name = "tabControl";
+            tabControl.SelectedIndex = 0;
+            tabControl.Size = new Size(433, 286);
+            tabControl.TabIndex = 0;
+            // 
+            // tabHotkey
+            // 
+            tabHotkey.BackColor = SystemColors.ActiveCaptionText;
+            tabHotkey.Location = new Point(4, 23);
+            tabHotkey.Name = "tabHotkey";
+            tabHotkey.Size = new Size(425, 259);
+            tabHotkey.TabIndex = 0;
+            tabHotkey.Text = "Hotkey";
+            // 
+            // tabTiming
+            // 
+            tabTiming.BackColor = SystemColors.ActiveCaptionText;
+            tabTiming.Location = new Point(4, 23);
+            tabTiming.Name = "tabTiming";
+            tabTiming.Size = new Size(428, 280);
+            tabTiming.TabIndex = 1;
+            tabTiming.Text = "Timing";
+            // 
+            // tabGeneral
+            // 
+            tabGeneral.BackColor = SystemColors.ActiveCaptionText;
+            tabGeneral.Location = new Point(4, 23);
+            tabGeneral.Name = "tabGeneral";
+            tabGeneral.Size = new Size(428, 280);
+            tabGeneral.TabIndex = 2;
+            tabGeneral.Text = "General";
+            // 
+            // About
+            // 
+            About.AccessibleName = "About";
+            About.Controls.Add(richTextBox1);
+            About.Location = new Point(4, 23);
+            About.Name = "About";
+            About.Padding = new Padding(3);
+            About.Size = new Size(428, 280);
+            About.TabIndex = 3;
+            About.Text = "About";
+            About.UseVisualStyleBackColor = true;
+            // 
+            // richTextBox1
+            // 
+            richTextBox1.BackColor = SystemColors.ActiveCaptionText;
+            richTextBox1.Dock = DockStyle.Fill;
+            richTextBox1.ForeColor = Color.Chartreuse;
+            richTextBox1.Location = new Point(3, 3);
+            richTextBox1.Name = "richTextBox1";
+            richTextBox1.ReadOnly = true;
+            richTextBox1.Size = new Size(422, 274);
+            richTextBox1.TabIndex = 0;
+            richTextBox1.Text = resources.GetString("richTextBox1.Text");
+            // 
+            // btnSave
+            // 
+            btnSave.Location = new Point(0, 0);
+            btnSave.Name = "btnSave";
+            btnSave.Size = new Size(75, 23);
+            btnSave.TabIndex = 1;
+            btnSave.Text = "Save";
+            btnSave.Click += BtnSave_Click;
+            // 
+            // btnCancel
+            // 
+            btnCancel.Location = new Point(80, 0);
+            btnCancel.Name = "btnCancel";
+            btnCancel.Size = new Size(75, 23);
+            btnCancel.TabIndex = 2;
+            btnCancel.Text = "Cancel";
+            btnCancel.Click += BtnCancel_Click;
+            // 
+            // statusStrip1
+            // 
+            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1, toolStripStatusScript, toolStripStatusNewWorld });
+            statusStrip1.Location = new Point(0, 289);
+            statusStrip1.Name = "statusStrip1";
+            statusStrip1.Size = new Size(434, 22);
+            statusStrip1.TabIndex = 3;
+            statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel1
+            // 
+            toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            toolStripStatusLabel1.Size = new Size(42, 17);
+            toolStripStatusLabel1.Text = "Status:";
+            // 
+            // toolStripStatusScript
+            // 
+            toolStripStatusScript.Name = "toolStripStatusScript";
+            toolStripStatusScript.Size = new Size(117, 17);
+            toolStripStatusScript.Text = "Script is not running.";
+            // 
+            // toolStripStatusNewWorld
+            // 
+            toolStripStatusNewWorld.Name = "toolStripStatusNewWorld";
+            toolStripStatusNewWorld.Size = new Size(139, 17);
+            toolStripStatusNewWorld.Text = "New World not detected.";
+            // 
+            // timer1
+            // 
+            timer1.Interval = 2000;
+            timer1.Tick += timer1_Tick;
+            // 
+            // SettingsForm
+            // 
+            BackColor = SystemColors.ActiveCaptionText;
+            ClientSize = new Size(434, 311);
+            Controls.Add(statusStrip1);
+            Controls.Add(tabControl);
+            Controls.Add(btnSave);
+            Controls.Add(btnCancel);
+            Font = new Font("0xProto Nerd Font", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            ForeColor = Color.Chartreuse;
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            MaximizeBox = false;
+            Name = "SettingsForm";
+            StartPosition = FormStartPosition.CenterParent;
+            Text = "Settings - New World AFK Preventer";
+            tabControl.ResumeLayout(false);
+            About.ResumeLayout(false);
+            statusStrip1.ResumeLayout(false);
+            statusStrip1.PerformLayout();
+            ResumeLayout(false);
+            PerformLayout();
+        }
+
+        private void SetupHotkeyTab()
+        {
+            lblCurrentHotkey = new Label
+            {
+                Text = "Current hotkey: Ctrl + F12",
+                Location = new System.Drawing.Point(20, 30),
+                Size = new System.Drawing.Size(300, 20)
+            };
+
+            btnChangeHotkey = new Button
+            {
+                Text = "Change Hotkey",
+                Location = new System.Drawing.Point(20, 70),
+                Size = new System.Drawing.Size(120, 30)
+            };
+            btnChangeHotkey.Click += BtnChangeHotkey_Click;
+
+            btnResetHotkey = new Button
+            {
+                Text = "Reset to Default",
+                Location = new System.Drawing.Point(150, 70),
+                Size = new System.Drawing.Size(180, 30)
+            };
+            btnResetHotkey.Click += BtnResetHotkey_Click;
+
+            tabHotkey.Controls.AddRange(new Control[] { lblCurrentHotkey, btnChangeHotkey, btnResetHotkey });
+        }
+
+        private void SetupTimingTab()
+        {
+            lblMinInterval = new Label
+            {
+                Text = "Minimum interval (minutes):",
+                Location = new System.Drawing.Point(20, 30),
+                Size = new System.Drawing.Size(180, 20)
+            };
+
+            lblMinutes1 = new Label
+            {
+                Text = "min",
+                Location = new System.Drawing.Point(285, 30),
+                Size = new System.Drawing.Size(30, 20)
+            };
+
+            lblMaxInterval = new Label
+            {
+                Text = "Maximum interval (minutes):",
+                Location = new System.Drawing.Point(20, 70),
+                Size = new System.Drawing.Size(180, 20)
+            };
+
+            lblMinutes2 = new Label
+            {
+                Text = "min",
+                Location = new System.Drawing.Point(285, 70),
+                Size = new System.Drawing.Size(30, 20)
+            };
+
+            tabTiming.Controls.AddRange(new Control[] {
+                lblMinInterval, nudMinInterval, lblMinutes1,
+                lblMaxInterval, nudMaxInterval, lblMinutes2
+            });
+        }
+
+        private void SetupGeneralTab()
+        {
+            chkStartMinimized = new CheckBox
+            {
+                Text = "Start minimized to tray",
+                Location = new System.Drawing.Point(20, 30),
+                Size = new System.Drawing.Size(200, 20)
+            };
+
+            chkShowNotifications = new CheckBox
+            {
+                Text = "Show notification balloons",
+                Location = new System.Drawing.Point(20, 60),
+                Size = new System.Drawing.Size(200, 20),
+                Checked = true
+            };
+
+            tabGeneral.Controls.AddRange(new Control[] { chkStartMinimized, chkShowNotifications });
+        }
+
+        private void LoadSettings()
+        {
+            if (settings != null)
+            {
+                // Update existing label instead of recreating it so it stays visible in the tab
+                if (lblCurrentHotkey != null)
+                {
+                    lblCurrentHotkey.Text = $"Current hotkey: {settings.HotkeyModifier} + {settings.Hotkey}";
+                }
+                else
+                {
+                    lblCurrentHotkey = new Label
+                    {
+                        Text = $"Current hotkey: {settings.HotkeyModifier} + {settings.Hotkey}",
+                        Location = new System.Drawing.Point(20, 30),
+                        Size = new System.Drawing.Size(300, 20)
+                    };
+                    tabHotkey.Controls.Add(lblCurrentHotkey);
+                }
+
+                // Ensure numeric up/downs have been created
+                if (nudMinInterval != null)
+                    nudMinInterval.Value = Math.Max(nudMinInterval.Minimum, Math.Min(nudMinInterval.Maximum, settings.MinInterval / 60000)); // Convert to minutes
+                if (nudMaxInterval != null)
+                    nudMaxInterval.Value = Math.Max(nudMaxInterval.Minimum, Math.Min(nudMaxInterval.Maximum, settings.MaxInterval / 60000)); // Convert to minutes
+
+                chkStartMinimized.Checked = settings.StartMinimized;
+                chkShowNotifications.Checked = settings.ShowNotifications;
+            }
+            else
+            {
+                if (lblCurrentHotkey != null)
+                {
+                    lblCurrentHotkey.Text = "Current hotkey: Not set";
+                }
+                else
+                {
+                    lblCurrentHotkey = new Label
+                    {
+                        Text = "Current hotkey: Not set",
+                        Location = new System.Drawing.Point(20, 30),
+                        Size = new System.Drawing.Size(300, 20)
+                    };
+                    tabHotkey.Controls.Add(lblCurrentHotkey);
+                }
+
+                // Set default values for the controls when settings is null
+                if (nudMinInterval != null) nudMinInterval.Value = 1; // Set a default value
+                if (nudMaxInterval != null) nudMaxInterval.Value = 10; // Set a default value
+                if (chkStartMinimized != null) chkStartMinimized.Checked = false; // Set a default value
+                if (chkShowNotifications != null) chkShowNotifications.Checked = false; // Set a default value
+            }
+        }
+
+        private void BtnChangeHotkey_Click(object sender, EventArgs e)
+        {
+            using (HotkeyRecorder recorder = new HotkeyRecorder())
+            {
+                if (recorder.ShowDialog() == DialogResult.OK)
+                {
+                    if (settings != null)
+                    {
+                        settings.Hotkey = recorder.Hotkey;
+                        settings.HotkeyModifier = recorder.Modifier;
+                        // Update visible label
+                        if (lblCurrentHotkey != null)
+                            lblCurrentHotkey.Text = $"Current hotkey: {settings.HotkeyModifier} + {settings.Hotkey}";
+                    }
+                }
+            }
+        }
+
+        private void BtnResetHotkey_Click(object sender, EventArgs e)
+        {
+            if (settings != null)
+            {
+                settings.Hotkey = Keys.F12;
+                settings.HotkeyModifier = Keys.Control;
+                if (lblCurrentHotkey != null)
+                    lblCurrentHotkey.Text = $"Current hotkey: {settings.HotkeyModifier} + {settings.Hotkey}";
+            }
+        }
+
+        private void BtnSave_Click(object sender, EventArgs e)
+        {
+            // Update settings from form
+            if (settings != null)
+            {
+                settings.MinInterval = (int)nudMinInterval.Value * 60000; // Convert minutes to milliseconds
+                settings.MaxInterval = (int)nudMaxInterval.Value * 60000; // Convert minutes to milliseconds
+                settings.StartMinimized = chkStartMinimized.Checked;
+                settings.ShowNotifications = chkShowNotifications.Checked;
+
+                // Save settings
+                settings.Save();
+
+                // Re-register hotkey immediately so the new hotkey takes effect
+                AfkPreventer? mainForm = Application.OpenForms.OfType<AfkPreventer>().FirstOrDefault();
+                mainForm?.ReRegisterHotkey();
+            }
+
+            this.DialogResult = DialogResult.OK;
+            this.Close();
+        }
+
+        private void BtnCancel_Click(object sender, EventArgs e)
+        {
+            this.DialogResult = DialogResult.Cancel;
+            this.Close();
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            bool newWorldRunning = IsNewWorldRunning();
+            toolStripStatusNewWorld.Text = newWorldRunning ? "New World detected." : "New World not detected.";
+
+            // Find the main AfkPreventer form instance
+            AfkPreventer? mainForm = Application.OpenForms.OfType<AfkPreventer>().FirstOrDefault();
+
+            if (mainForm != null && mainForm.IsRunning && newWorldRunning)
+            {
+                toolStripStatusScript.Text = "Script is running.";
+            }
+            else
+            {
+                toolStripStatusScript.Text = "Script is not running.";
+            }
+        }
+
+        private bool IsNewWorldRunning()
+        {
+            Process[] processes = Process.GetProcessesByName("NewWorld");
+            if (processes.Length == 0) return false;
+
+            try
+            {
+                IntPtr hwnd = processes[0].MainWindowHandle;
+                if (hwnd == IntPtr.Zero) return false; // Check if main window handle is valid
+
+                // Use GetWindowText to check if the window has a title (is visible)
+                System.Text.StringBuilder text = new System.Text.StringBuilder(256);
+                GetWindowText(hwnd, text, 256);
+                return !string.IsNullOrEmpty(text.ToString()) && IsWindowVisible(hwnd);
+            }
+            catch (Exception)
+            {
+                // Handle potential exceptions, such as access denied
+                return false;
+            }
+        }
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool IsWindowVisible(IntPtr hWnd);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        static extern int GetWindowText(IntPtr hWnd, System.Text.StringBuilder lpString, int nMaxCount);
+    }
+}
