@@ -24,18 +24,18 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore NewWorldAfkPreventer.csproj
 
     - name: Build project
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build NewWorldAfkPreventer.csproj --configuration Release --no-restore
 
-    - name: Publish project
-      run: dotnet publish --configuration Release --no-build --output ./publish
+    - name: Build portable executable
+      run: call build-porteable.bat
 
     - name: Create artifact
       run: |
-        cd ./publish
-        7z a ../${{ env.PROJECT_NAME }}-${{ github.ref_name }}.zip *
+        cd ./bin/Release/net8.0-windows/win-x64/publish
+        7z a ../../../${{ env.PROJECT_NAME }}-${{ github.ref_name }}.zip *
 
     - name: Upload build artifact
       uses: actions/upload-artifact@v4

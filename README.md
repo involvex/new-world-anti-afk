@@ -22,20 +22,19 @@ A smart AFK prevention tool for New World that sends random key presses to preve
 
 ### Quick Start (Recommended)
 
-1. **Build and run the application:**
-   ```batch
-   build-and-run.bat
-   ```
+1. **Download the latest release:**
+   - Go to [GitHub Releases](https://github.com/involvex/new-world-anti-afk/releases)
+   - Download the latest `NewWorldAfkPreventer-vX.X.X.zip` file
+   - Extract the ZIP to any folder
 
-2. **Start New World** and make sure it's visible on screen
+2. **Run the application:**
+   - Double-click `NewWorldAfkPreventer.exe`
+   - The app will start minimized to the system tray
 
-3. **Access settings (optional):**
-   - Right-click the tray icon and select "Settings"
-   - Configure hotkey, timing, and other preferences
-   - Settings are saved automatically
+3. **Start New World** and make sure it's visible on screen
 
 4. **Toggle AFK prevention:**
-   - Press your configured hotkey (default: **Ctrl+F12**) to start/stop
+   - Press **Ctrl+F12** (default hotkey) to start/stop
    - Or right-click the tray icon and select "Toggle AFK Prevention"
    - Or double-click the tray icon
 
@@ -44,35 +43,10 @@ A smart AFK prevention tool for New World that sends random key presses to preve
    - Show notifications when starting/stopping (if enabled)
    - Display status in tray icon tooltip
 
-### GitHub Pages
+### Documentation
 
-The documentation site is automatically deployed when changes are pushed to the main branch:
-
-🌐 **Live Site:** `https://involvex.github.io/new-world-anti-afk/`
-
-### Documentation Features
-
-- **Responsive Design**: Works perfectly on desktop, tablet, and mobile
-- **Dark/Light Mode**: Toggle between themes with persistent preference
-- **Interactive Elements**: Tabbed settings preview, hover effects, animations
-- **Modern UI**: Clean design with New World theming and gradients
-- **Accessibility**: Keyboard navigation, ARIA labels, and screen reader support
-- **Performance**: Optimized loading with intersection observers and lazy loading
-
-## Supporting the Project
-
-This project is open source and free to use. If you'd like to support the development:
-
-### GitHub Sponsors
-Enable GitHub Sponsors in your repository settings to allow community contributions.
-
-### Other Platforms
-Update `.github/FUNDING.yml` with your preferred funding platforms:
-- **Buy Me a Coffee**: For one-time donations
-- **PayPal**: Direct payment support
-- **Custom Links**: Add your own sponsorship URLs
-
-The funding information will appear on your repository main page and can be linked from the documentation site.
+For detailed documentation, settings guide, and support:
+🌐 **Documentation Site:** `https://involvex.github.io/new-world-anti-afk/`
 
 ## Settings & Configuration
 
