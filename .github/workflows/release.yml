@@ -30,7 +30,9 @@ jobs:
       run: dotnet build NewWorldAfkPreventer.csproj --configuration Release --no-restore
 
     - name: Build portable executable
-      run: call build-porteable.bat
+      shell: cmd
+      run: |
+        call build-porteable.bat
 
     - name: Create artifact
       run: |

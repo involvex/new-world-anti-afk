@@ -11,11 +11,33 @@ namespace NewWorldAfkPreventer
     public class AfkPreventer : Form
     {
         private NotifyIcon? trayIcon;
-        private System.ComponentModel.IContainer? components;
-        private bool isRunning = false;
+        private System.ComponentModel.Container? components;
+        private bool isRunning;
         private System.Windows.Forms.Timer? timer;
-        private Random random = new Random();
+        private readonly Random random = new();
         private AppSettings settings = AppSettings.Load();
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        private static extern int SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+
+        private void TrayIcon_MouseClick(object? sender, MouseEventArgs e)
+        {
+            try
+            {
+                if (e.Button == MouseButtons.Left && trayIcon?.ContextMenuStrip != null)
+                {
+                    Debug.WriteLine("Left click on tray icon, showing context menu");
+                    // Get the ShowContextMenu method using reflection
+                    var mi = typeof(NotifyIcon).GetMethod("ShowContextMenu",
+                        System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                    mi?.Invoke(trayIcon, null);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error handling tray icon click: {ex.Message}");
+            }
+        }
 
         // Win32 API constants and imports
         private const uint WM_HOTKEY = 0x0312;
@@ -26,101 +48,221 @@ namespace NewWorldAfkPreventer
         [DllImport("user32.dll")]
         private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
-        [DllImport("user32.dll")]
-        private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        private static extern IntPtr FindWindow(string? lpClassName, string lpWindowName);
 
         [DllImport("user32.dll")]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
 
-        [DllImport("user32.dll")]
-        private static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
-
-        [DllImport("user32.dll")]
-        private static extern int GetWindowText(IntPtr hWnd, System.Text.StringBuilder text, int count);
+        [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern int GetWindowText(IntPtr hWnd, char[] lpString, int nMaxCount);
 
         [DllImport("user32.dll")]
         private static extern bool IsWindowVisible(IntPtr hWnd);
 
-        private const int KEYEVENTF_KEYUP = 0x0002;
-        private const byte VK_W = 0x57;
-        private const byte VK_A = 0x41;
-        private const byte VK_S = 0x53;
-        private const byte VK_D = 0x44;
-        private const byte VK_SPACE = 0x20;
-
         public AfkPreventer()
         {
+            // Initialize form
             InitializeComponent();
+            this.Load += AfkPreventer_Load;
+            this.FormClosing += AfkPreventer_FormClosing;
+            this.Resize += AfkPreventer_Resize;
+
+            // Setup tray icon and hotkey
             SetupTrayIcon();
             bool reg = RegisterHotkey();
             UpdateTrayHotkeyStatus(reg);
 
-            // TopMost aus Settings übernehmen
+            // Apply settings
             this.TopMost = settings.AlwaysOnTop;
 
-            this.WindowState = FormWindowState.Minimized;
-            this.ShowInTaskbar = false;
-
-            using (SettingsForm settingsForm = new SettingsForm(settings))
+            // Initial form state
+            if (settings.StartMinimized)
             {
-                if (settingsForm.ShowDialog() == DialogResult.OK)
+                this.WindowState = FormWindowState.Minimized;
+                this.ShowInTaskbar = false;
+            }
+        }
+
+        private void AfkPreventer_Load(object? sender, EventArgs e)
+        {
+            string settingsDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "NewWorldAfkPreventer");
+            string settingsPath = Path.Combine(settingsDir, "settings.json");
+
+            if (!File.Exists(settingsPath))
+            {
+                using (SettingsForm settingsForm = new(settings))
                 {
-                    settings = AppSettings.Load();
-                    this.TopMost = settings.AlwaysOnTop; // Nach Settings-Dialog übernehmen
-                    ReRegisterHotkey();
+                    if (settingsForm.ShowDialog() == DialogResult.OK)
+                    {
+                        settings = AppSettings.Load();
+                        this.TopMost = settings.AlwaysOnTop;
+                        ReRegisterHotkey();
+                    }
                 }
+            }
+
+            // Ensure tray icon is visible after form load
+            if (trayIcon != null)
+            {
+                trayIcon.Visible = true;
+            }
+        }
+
+        private void AfkPreventer_FormClosing(object? sender, FormClosingEventArgs e)
+        {
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                e.Cancel = true;
+                this.WindowState = FormWindowState.Minimized;
+                this.ShowInTaskbar = false;
+            }
+        }
+
+        private void AfkPreventer_Resize(object? sender, EventArgs e)
+        {
+            if (this.WindowState == FormWindowState.Minimized)
+            {
+                this.ShowInTaskbar = false;
+                EnsureTrayIconVisible();
+            }
+            else
+            {
+                this.ShowInTaskbar = true;
+            }
+        }
+
+        private void EnsureTrayIconVisible()
+        {
+            if (trayIcon == null || !trayIcon.Visible)
+            {
+                Debug.WriteLine("Tray icon not visible, recreating...");
+                SetupTrayIcon();
+                return;
+            }
+
+            try
+            {
+                trayIcon.Visible = true;
+                Debug.WriteLine("Ensuring tray icon visibility");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error ensuring tray visibility: {ex.Message}");
+                SetupTrayIcon(); // Recreate if there was an error
             }
         }
 
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+
+            // Main timer for AFK prevention
             this.timer = new System.Windows.Forms.Timer(this.components);
             if (this.timer != null)
             {
                 this.timer.Interval = GetRandomInterval();
-                this.timer.Tick += Timer_Tick;
+                this.timer.Tick += TimerTick;
             }
 
-            // Set form properties for minimized start
+            // Timer to ensure tray icon stays visible
+            var trayCheckTimer = new System.Windows.Forms.Timer(this.components)
+            {
+                Interval = 5000 // Check every 5 seconds
+            };
+            trayCheckTimer.Tick += (s, e) => EnsureTrayIconVisible();
+
             this.WindowState = FormWindowState.Minimized;
             this.ShowInTaskbar = false;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.Size = new System.Drawing.Size(600, 400);
-
-            // Hide form from alt-tab
-            this.ShowInTaskbar = false;
         }
 
         private void SetupTrayIcon()
         {
-            trayIcon = new NotifyIcon(this.components);
-
-            // Use the application's icon for the tray
             try
             {
-                trayIcon.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+                Debug.WriteLine("Starting tray icon setup");
+
+                // Ensure we have a component container
+                if (components == null)
+                {
+                    components = new System.ComponentModel.Container();
+                    Debug.WriteLine("Created new Container for components");
+                }
+
+                // Clean up existing tray icon if any
+                if (trayIcon != null)
+                {
+                    Debug.WriteLine("Cleaning up existing tray icon");
+                    try
+                    {
+                        trayIcon.Visible = false;
+                        trayIcon.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Error cleaning up old tray icon: {ex.Message}");
+                    }
+                }
+
+                // Create new tray icon
+                Debug.WriteLine("Creating new NotifyIcon");
+                trayIcon = new NotifyIcon(components)
+                {
+                    Text = "New World AFK Preventer",
+                    Visible = false // Start invisible, set to true after full setup
+                };
+
+                // Set up context menu first
+                Debug.WriteLine("Creating context menu");
+                var contextMenu = new ContextMenuStrip(components);
+                contextMenu.Items.Add("Toggle AFK Prevention", null, OnToggleAfkPrevention);
+                contextMenu.Items.Add("Settings", null, OnSettings);
+                contextMenu.Items.Add("-");
+                contextMenu.Items.Add("Exit", null, OnExit);
+                trayIcon.ContextMenuStrip = contextMenu;
+
+                // Set up icon
+                try
+                {
+                    using var stream = new FileStream("logo.png", FileMode.Open);
+                    if (stream != null)
+                    {
+                        Debug.WriteLine("Loading custom icon from logo.png");
+                        Bitmap bitmap = new Bitmap(stream);
+                        trayIcon.Icon = Icon.FromHandle(bitmap.GetHicon());
+                    }
+                    else
+                    {
+                        Debug.WriteLine("Custom icon not found, using system icon");
+                        trayIcon.Icon = SystemIcons.Application;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error loading icon: {ex.Message}");
+                    trayIcon.Icon = SystemIcons.Application;
+                }
+
+                // Add event handlers
+                trayIcon.DoubleClick += OnToggleAfkPrevention;
+                trayIcon.MouseClick += TrayIcon_MouseClick;
+
+                // Finally make it visible
+                Debug.WriteLine("Making tray icon visible");
+                trayIcon.Visible = true;
+
+                Debug.WriteLine("Tray icon setup complete");
             }
-            catch
+            catch (Exception ex)
             {
-                trayIcon.Icon = System.Drawing.SystemIcons.Application;
+                Debug.WriteLine($"Error setting up tray icon: {ex.Message}");
+                MessageBox.Show($"Error setting up tray icon: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
-            trayIcon.Text = "New World AFK Preventer";
-            trayIcon.Visible = true;
-
-            ContextMenuStrip trayMenu = new ContextMenuStrip();
-            trayMenu.Items.Add("Toggle AFK Prevention", null, OnToggleAfkPrevention);
-            trayMenu.Items.Add("Settings", null, OnSettings);
-            trayMenu.Items.Add("-");
-            trayMenu.Items.Add("Exit", null, OnExit);
-
-            trayIcon.ContextMenuStrip = trayMenu;
-            trayIcon.DoubleClick += OnToggleAfkPrevention;
         }
 
-        // Helper: convert Keys modifier flags to Win32 modifier mask
-        private uint ModifiersFromKeys(Keys modifiers)
+        private static uint ModifiersFromKeys(Keys modifiers)
         {
             uint mask = 0;
             if (modifiers.HasFlag(Keys.Control)) mask |= 0x0002; // MOD_CONTROL
@@ -129,12 +271,12 @@ namespace NewWorldAfkPreventer
             return mask;
         }
 
-        // Try a single registration attempt
         private bool TryRegisterCombination(Keys key, Keys modifier)
         {
             uint modifiers = ModifiersFromKeys(modifier);
             try
             {
+                UnregisterHotKey(this.Handle, 0); // Clean up any existing registration
                 return RegisterHotKey(this.Handle, 0, modifiers, (uint)key);
             }
             catch
@@ -143,7 +285,6 @@ namespace NewWorldAfkPreventer
             }
         }
 
-        // Modified RegisterHotkey to return success, notify, and try alternatives if needed
         private bool RegisterHotkey()
         {
             Keys originalKey = settings.Hotkey;
@@ -152,101 +293,45 @@ namespace NewWorldAfkPreventer
             // Try original combination first
             if (TryRegisterCombination(originalKey, originalModifier))
             {
-                trayIcon?.ShowBalloonTip(3000, "Hotkey registered", $"Hotkey registered: {originalModifier} + {originalKey}", ToolTipIcon.Info);
+                ShowNotification($"Hotkey registered: {originalModifier} + {originalKey}");
                 return true;
             }
 
-            // Define modifier alternatives (try less/more modifiers)
-            Keys[] modifierAlternatives = new Keys[]
-            {
-                originalModifier, // already tried
-                Keys.Control | Keys.Alt | Keys.Shift,
-                Keys.Control | Keys.Alt,
-                Keys.Control | Keys.Shift,
-                Keys.Alt | Keys.Shift,
-                Keys.Control,
-                Keys.Alt,
-                Keys.Shift,
-                Keys.None
-            };
-
-            // Try same key with different modifier combos
-            foreach (var mod in modifierAlternatives)
-            {
-                if (mod == originalModifier) continue; // skip, already tried
-                if (TryRegisterCombination(originalKey, mod))
-                {
-                    settings.Hotkey = originalKey;
-                    settings.HotkeyModifier = mod;
-                    settings.Save();
-                    trayIcon?.ShowBalloonTip(4000, "Hotkey registered (alternative)", $"Using alternative hotkey: {mod} + {originalKey}", ToolTipIcon.Info);
-                    return true;
-                }
-            }
-
-            // If still not registered, try fallback keys with modifier alternatives
-            Keys[] fallbackKeys = new Keys[] { Keys.F12, Keys.F11, Keys.F10, Keys.F9, Keys.F8 };
-
-            foreach (var fk in fallbackKeys)
-            {
-                foreach (var mod in modifierAlternatives)
-                {
-                    if (TryRegisterCombination(fk, mod))
-                    {
-                        settings.Hotkey = fk;
-                        settings.HotkeyModifier = mod;
-                        settings.Save();
-                        trayIcon?.ShowBalloonTip(4000, "Hotkey registered (fallback)", $"Using fallback hotkey: {mod} + {fk}", ToolTipIcon.Info);
-                        return true;
-                    }
-                }
-            }
-
-            // All attempts failed
-            try
-            {
-                MessageBox.Show($"Failed to register hotkey {originalModifier} + {originalKey}. No alternative keys available.", "Hotkey Registration", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            catch { }
-
-            trayIcon?.ShowBalloonTip(4000, "Hotkey registration failed", "The configured hotkey could not be registered and no alternative was found.", ToolTipIcon.Warning);
-            return false;
+            ShowNotification("Failed to register hotkey. Using default Ctrl+F12.");
+            settings.Hotkey = Keys.F12;
+            settings.HotkeyModifier = Keys.Control;
+            settings.Save();
+            return TryRegisterCombination(Keys.F12, Keys.Control);
         }
 
-        // Update tray tooltip text to include current hotkey and registration status
         private void UpdateTrayHotkeyStatus(bool registered)
         {
             if (trayIcon == null) return;
 
-            string running = isRunning ? "Running" : "Stopped";
-            string hotkeyText = $"{settings.HotkeyModifier} + {settings.Hotkey}";
-            string regText = registered ? "Registered" : "Not registered";
+            string text = $"New World AFK Preventer - {(registered ? "Hotkey active" : "Hotkey inactive")}";
+            text += $"\nHotkey: {settings.HotkeyModifier} + {settings.Hotkey}";
+            text += $"\nStatus: {(isRunning ? "Running" : "Stopped")}";
 
-            string text = $"New World AFK Preventer - {running} - Hotkey: {hotkeyText} ({regText})";
-
-            // Tray tooltip max length is limited; ensure not to exceed it
-            if (text.Length > 63) text = text.Substring(0, 63);
-
+            if (text.Length > 63) text = text[..63];
             trayIcon.Text = text;
         }
 
-        // New public method to re-register hotkey and update timer if needed
         public void ReRegisterHotkey()
         {
-            try
-            {
-                UnregisterHotKey(this.Handle, 0);
-            }
-            catch { }
+            UnregisterHotKey(this.Handle, 0);
+            bool success = RegisterHotkey();
+            UpdateTrayHotkeyStatus(success);
 
-            bool reg = RegisterHotkey();
+            if (!success)
+            {
+                ShowNotification("Warning: Could not register hotkey");
+            }
 
             if (isRunning && timer != null)
             {
                 timer.Interval = GetRandomInterval();
             }
-
-            UpdateTrayHotkeyStatus(reg);
+            UpdateTrayText();
         }
 
         private int GetRandomInterval()
@@ -262,64 +347,133 @@ namespace NewWorldAfkPreventer
             }
         }
 
-        private void OnSettings(object sender, EventArgs e)
+        private void OnSettings(object? sender, EventArgs e)
         {
-            using (SettingsForm settingsForm = new SettingsForm(settings))
+            using SettingsForm settingsForm = new(settings);
+            if (settingsForm.ShowDialog(this) == DialogResult.OK)
             {
-                if (settingsForm.ShowDialog() == DialogResult.OK)
-                {
-                    // Reload settings
-                    settings = AppSettings.Load();
-                    this.TopMost = settings.AlwaysOnTop; // Nach Settings-Dialog übernehmen
-                    ReRegisterHotkey();
+                settings = AppSettings.Load();
+                this.TopMost = settings.AlwaysOnTop;
+                ReRegisterHotkey();
 
-                    // Update timer interval if running
-                    if (isRunning && timer != null)
-                    {
-                        timer.Interval = GetRandomInterval();
-                    }
+                if (isRunning && timer != null)
+                {
+                    timer.Interval = GetRandomInterval();
                 }
             }
         }
 
-        private bool IsNewWorldRunning()
+        private static bool IsNewWorldRunning()
         {
-            Process[] processes = Process.GetProcessesByName("NewWorld");
-            if (processes.Length == 0) return false;
-
-            IntPtr hwnd = processes[0].MainWindowHandle;
-            return hwnd != IntPtr.Zero && IsWindowVisible(hwnd);
-        }
-
-        private void SendKeyPress(byte key)
-        {
-            Process[] processes = Process.GetProcessesByName("NewWorld");
-            if (processes.Length == 0) return;
-
-            IntPtr hwnd = processes[0].MainWindowHandle;
-            if (hwnd != IntPtr.Zero)
+            try
             {
-                SetForegroundWindow(hwnd);
-                Thread.Sleep(100);
+                Debug.WriteLine("Checking for New World process...");
 
-                keybd_event(key, 0, 0, UIntPtr.Zero);
-                Thread.Sleep(50);
-                keybd_event(key, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
+                // First try by process name
+                Process[] processes = Process.GetProcessesByName("NewWorld");
+                Debug.WriteLine($"Found {processes.Length} processes named 'NewWorld'");
+
+                if (processes.Length == 0)
+                {
+                    Debug.WriteLine("Searching all processes for New World window...");
+                    // Get all processes
+                    processes = Process.GetProcesses();
+                    Debug.WriteLine($"Found {processes.Length} total processes");
+
+                    // Filter processes with visible windows
+                    processes = processes.Where(p =>
+                    {
+                        try
+                        {
+                            if (p.HasExited || p.MainWindowHandle == IntPtr.Zero)
+                                return false;
+
+                            char[] text = new char[256];
+                            int length = GetWindowText(p.MainWindowHandle, text, text.Length);
+
+                            if (length > 0 && IsWindowVisible(p.MainWindowHandle))
+                            {
+                                string windowTitle = new string(text, 0, length);
+                                Debug.WriteLine($"Found window: {windowTitle} (Process: {p.ProcessName})");
+                                return windowTitle.Contains("New World", StringComparison.OrdinalIgnoreCase);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"Error checking process {p.ProcessName}: {ex.Message}");
+                        }
+                        return false;
+                    }).ToArray();
+
+                    Debug.WriteLine($"Found {processes.Length} processes with New World in title");
+                }
+
+                // Check each process in detail
+                foreach (Process process in processes)
+                {
+                    try
+                    {
+                        Debug.WriteLine($"Checking process: {process.ProcessName}");
+
+                        if (process.HasExited)
+                        {
+                            Debug.WriteLine("Process has exited, skipping");
+                            continue;
+                        }
+
+                        IntPtr handle = process.MainWindowHandle;
+                        if (handle == IntPtr.Zero)
+                        {
+                            Debug.WriteLine("Process has no main window, skipping");
+                            continue;
+                        }
+
+                        if (!IsWindowVisible(handle))
+                        {
+                            Debug.WriteLine("Window is not visible, skipping");
+                            continue;
+                        }
+
+                        char[] text = new char[256];
+                        int length = GetWindowText(handle, text, text.Length);
+                        if (length > 0)
+                        {
+                            string windowTitle = new string(text, 0, length);
+                            Debug.WriteLine($"Window title: {windowTitle}");
+
+                            if (windowTitle.Contains("New World", StringComparison.OrdinalIgnoreCase))
+                            {
+                                Debug.WriteLine("New World found!");
+                                return true;
+                            }
+                        }
+                        else
+                        {
+                            Debug.WriteLine("Window has no title");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Error checking process: {ex.Message}");
+                    }
+                }
+
+                Debug.WriteLine("New World not found");
             }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error in IsNewWorldRunning: {ex.Message}");
+            }
+            return false;
         }
 
-        private void SendSmartKeyPress()
-        {
-            byte[] keys = { VK_W, VK_A, VK_S, VK_D, VK_SPACE };
-            byte randomKey = keys[random.Next(keys.Length)];
-            SendKeyPress(randomKey);
-        }
 
-        public void Timer_Tick(object? sender, EventArgs e)
+
+        public void TimerTick(object? sender, EventArgs e)
         {
             if (isRunning && IsNewWorldRunning())
             {
-                SendSmartKeyPress();
+                ExecutePowerShellScript("anti-afk.ps1", "-TriggerOnce");
                 if (timer != null)
                 {
                     timer.Interval = GetRandomInterval();
@@ -337,16 +491,17 @@ namespace NewWorldAfkPreventer
 
             if (!IsNewWorldRunning())
             {
-                ShowNotification("New World not detected. Please make sure New World is running and visible.");
+                ShowNotification("New World is not running!");
                 return;
             }
 
             isRunning = true;
+            ShowNotification("AFK Prevention started");
             if (timer != null)
             {
+                timer.Interval = GetRandomInterval();
                 timer.Start();
             }
-            ShowNotification("AFK prevention started");
             UpdateTrayText();
         }
 
@@ -355,12 +510,53 @@ namespace NewWorldAfkPreventer
             if (!isRunning) return;
 
             isRunning = false;
+            ShowNotification("AFK Prevention stopped");
             if (timer != null)
             {
                 timer.Stop();
             }
-            ShowNotification("AFK prevention stopped");
             UpdateTrayText();
+        }
+
+        private void ExecutePowerShellScript(string scriptName, string arguments)
+        {
+            try
+            {
+                string scriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, scriptName);
+                if (!File.Exists(scriptPath))
+                {
+                    Debug.WriteLine($"Script not found at: {scriptPath}");
+                    ShowNotification($"Error: {scriptName} not found!");
+                    return;
+                }
+
+                ProcessStartInfo startInfo = new()
+                {
+                    FileName = "powershell.exe",
+                    Arguments = $"-NoProfile -ExecutionPolicy Bypass -File \"{scriptPath}\" {arguments}",
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                };
+
+                using Process process = new() { StartInfo = startInfo };
+                process.Start();
+
+                // Asynchronously read the output
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+
+                process.OutputDataReceived += (sender, args) => { if (args.Data != null) Debug.WriteLine($"PS Output: {args.Data}"); };
+                process.ErrorDataReceived += (sender, args) => { if (args.Data != null) Debug.WriteLine($"PS Error: {args.Data}"); };
+
+                // Don't wait for exit in this case, let it run in the background
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error executing PowerShell script: {ex.Message}");
+                ShowNotification("Error running AFK script.");
+            }
         }
 
         private void ToggleAfkPrevention()
@@ -375,24 +571,75 @@ namespace NewWorldAfkPreventer
         {
             if (trayIcon != null)
             {
-                trayIcon.Text = $"New World AFK Preventer - {(isRunning ? "Running" : "Stopped")}";
+                string status = isRunning ? "Running" : "Stopped";
+                trayIcon.Text = $"New World AFK Preventer - {status}";
             }
         }
 
-        private void OnToggleAfkPrevention(object sender, EventArgs e)
+        private void OnToggleAfkPrevention(object? sender, EventArgs e)
         {
             ToggleAfkPrevention();
         }
 
-        private void OnExit(object sender, EventArgs e)
+        private void OnExit(object? sender, EventArgs e)
         {
             StopAfkPrevention();
             UnregisterHotKey(this.Handle, 0);
-            if (trayIcon != null)
+            CleanupAndExit();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
             {
-                trayIcon.Dispose();
+                Debug.WriteLine("Disposing AfkPreventer form");
+                try
+                {
+                    if (trayIcon != null)
+                    {
+                        Debug.WriteLine("Disposing tray icon");
+                        trayIcon.Visible = false;
+                        trayIcon.Dispose();
+                        trayIcon = null;
+                    }
+
+                    if (timer != null)
+                    {
+                        Debug.WriteLine("Disposing timer");
+                        timer.Stop();
+                        timer.Dispose();
+                        timer = null;
+                    }
+
+                    if (components != null)
+                    {
+                        Debug.WriteLine("Disposing components");
+                        components.Dispose();
+                        components = null;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error during dispose: {ex.Message}");
+                }
             }
-            Application.Exit();
+            base.Dispose(disposing);
+        }
+
+        private void CleanupAndExit()
+        {
+            try
+            {
+                Debug.WriteLine("Starting cleanup and exit");
+                this.Dispose();
+                Application.Exit();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error during cleanup: {ex.Message}");
+                // Force exit if cleanup fails
+                Environment.Exit(1);
+            }
         }
 
         protected override void WndProc(ref Message m)
@@ -408,8 +655,7 @@ namespace NewWorldAfkPreventer
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+            ApplicationConfiguration.Initialize();
             Application.Run(new AfkPreventer());
         }
 

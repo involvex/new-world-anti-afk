@@ -15,7 +15,8 @@ A smart AFK prevention tool for New World that sends random key presses to preve
 ## Requirements
 
 - Windows 10/11
-- .NET 6.0 or later (automatically checked by build script)
+- .NET 8.0 or later
+- PowerShell 5.1 or later (usually pre-installed on Windows)
 - New World game running
 
 ## Installation & Usage
@@ -39,7 +40,7 @@ A smart AFK prevention tool for New World that sends random key presses to preve
    - Or double-click the tray icon
 
 5. **The application will:**
-   - Send random key presses every 3-8 minutes (configurable)
+   - Execute a PowerShell script to send random key presses every 3-8 minutes (configurable)
    - Show notifications when starting/stopping (if enabled)
    - Display status in tray icon tooltip
 
@@ -72,13 +73,13 @@ All settings are automatically saved to `settings.json` and persist between sess
 
 1. **Window Detection**: Continuously monitors for the New World process
 2. **Smart Timing**: Uses random intervals between min/max settings to avoid detection
-3. **Key Selection**: Randomly selects from W, A, S, D, and Space keys
-4. **Window Focus**: Brings New World to foreground before sending keys
+3. **PowerShell Execution**: Calls an external PowerShell script (`anti-afk.ps1`) to send key presses.
+4. **Window Focus**: The script brings New World to the foreground before sending keys.
 5. **Auto-Management**: Automatically stops if New World closes
 
 ## Safety Features
 
-- **Non-intrusive**: Only sends single key presses, doesn't interfere with gameplay
+- **Separation of Concerns**: The key press logic is handled by a separate, transparent PowerShell script.
 - **Random timing**: Varies intervals to appear more human-like
 - **Window validation**: Only sends keys when New World is actually visible
 - **Easy toggle**: Can be instantly stopped with hotkey or tray menu
@@ -86,26 +87,28 @@ All settings are automatically saved to `settings.json` and persist between sess
 ## Troubleshooting
 
 ### Application won't start
-- Make sure .NET 6.0+ is installed
+- Make sure .NET 8.0+ is installed
 - Run `dotnet --version` to check
 
 ### Hotkey not working
-- Try clicking on the console window first
+- Try clicking on the application window first
 - Make sure no other application is using Ctrl+F12
 
 ### Keys not being sent
 - Ensure New World is running and visible
 - Check that the game window isn't minimized
 - Look for tray icon notifications
+- Ensure PowerShell scripts can be executed. The application attempts to bypass the execution policy, but restrictive system settings might interfere.
 
 ### Build errors
-- Update to .NET 6.0 or later
+- Update to .NET 8.0 or later
 - Clean and rebuild: `dotnet clean && dotnet restore`
 
 ## Project Structure
 
 ```
 ├── NewWorldAfkPreventer.cs    # Main C# application
+├── anti-afk.ps1               # PowerShell script for key presses
 ├── Settings.cs                # Settings management
 ├── SettingsForm.cs            # Settings UI form
 ├── NewWorldAfkPreventer.csproj # .NET project file
@@ -114,7 +117,6 @@ All settings are automatically saved to `settings.json` and persist between sess
 ├── create-release.bat         # Release creation script
 ├── setup-github.bat           # GitHub repository setup
 ├── create-icon.bat            # Icon creation helper
-├── fokusnewworldscreenshot.ps1 # Legacy PowerShell script
 ├── .github/
 │   ├── workflows/
 │   │   ├── release.yml        # Release workflow
@@ -134,8 +136,8 @@ All settings are automatically saved to `settings.json` and persist between sess
 ## Technical Details
 
 - **Language**: C#
-- **Framework**: .NET 6.0 Windows Forms
-- **Input Simulation**: Win32 API keybd_event
+- **Framework**: .NET 8.0 Windows Forms
+- **Input Simulation**: PowerShell script (`anti-afk.ps1`) using `SendKeys`
 - **Hotkey Registration**: Win32 RegisterHotKey
 - **Process Detection**: System.Diagnostics.Process
 
@@ -154,6 +156,10 @@ Feel free to improve the algorithm, add features, or fix issues:
 5. Submit a pull request
 
 ## Changelog
+
+### v1.4.0
+- **PowerShell Integration**: Replaced the core `keybd_event` logic with an external PowerShell script (`anti-afk.ps1`) for more reliable input simulation.
+- **Updated Dependencies**: The project now targets .NET 8.0.
 
 ### v1.3.0
 - **Documentation Site**: Modern responsive website with dark/light mode

@@ -9,42 +9,42 @@ namespace NewWorldAfkPreventer
 {
     public class SettingsForm : Form
     {
-        private AppSettings settings;
-        private TabControl tabControl;
-        private TabPage tabHotkey;
-        private TabPage tabTiming;
-        private TabPage tabGeneral;
+        private readonly AppSettings settings;
+        private TabControl tabControl = null!;
+        private TabPage tabHotkey = null!;
+        private TabPage tabTiming = null!;
+        private TabPage tabGeneral = null!;
 
         // Hotkey tab controls
-        private Label lblCurrentHotkey;
-        private Button btnChangeHotkey;
-        private Button btnResetHotkey;
+        private Label lblCurrentHotkey = null!;
+        private Button btnChangeHotkey = null!;
+        private Button btnResetHotkey = null!;
 
         // Timing tab controls
-        private Label lblMinInterval;
-        private NumericUpDown nudMinInterval;
-        private Label lblMaxInterval;
-        private NumericUpDown nudMaxInterval;
-        private Label lblMinutes1;
-        private Label lblMinutes2;
+        private Label lblMinInterval = null!;
+        private NumericUpDown nudMinInterval = null!;
+        private Label lblMaxInterval = null!;
+        private NumericUpDown nudMaxInterval = null!;
+        private Label lblMinutes1 = null!;
+        private Label lblMinutes2 = null!;
 
         // General tab controls
-        private CheckBox chkStartMinimized;
-        private CheckBox chkShowNotifications;
-        private CheckBox chkAlwaysOnTop; // NEU: Feld für AlwaysOnTop
+        private CheckBox chkStartMinimized = null!;
+        private CheckBox chkShowNotifications = null!;
+        private CheckBox chkAlwaysOnTop = null!;
 
         // Common controls
-        private Button btnSave;
-        private TabPage About;
-        private RichTextBox richTextBox1;
-        private StatusStrip statusStrip1;
-        private ToolStripStatusLabel toolStripStatusLabel1;
-        private ToolStripStatusLabel toolStripStatusScript;
-        private ToolStripStatusLabel toolStripStatusNewWorld;
-        private Timer timer1;
-        private System.ComponentModel.IContainer components;
-        private Button button1;
-        private Button btnCancel;
+        private Button btnSave = null!;
+        private TabPage About = null!;
+        private RichTextBox richTextBox1 = null!;
+        private StatusStrip statusStrip1 = null!;
+        private ToolStripStatusLabel toolStripStatusLabel1 = null!;
+        private ToolStripStatusLabel toolStripStatusScript = null!;
+        private ToolStripStatusLabel toolStripStatusNewWorld = null!;
+        private System.Windows.Forms.Timer timer1 = null!;
+        private System.ComponentModel.IContainer components = null!;
+        private Button button1 = null!;
+        private Button btnCancel = null!;
 
         public SettingsForm(AppSettings settings)
         {
@@ -55,6 +55,7 @@ namespace NewWorldAfkPreventer
             SetupTimingTab();
             SetupGeneralTab();
             LoadSettings();
+            timer1.Start();
         }
 
         private void InitializeTimingTabControls()
@@ -94,7 +95,7 @@ namespace NewWorldAfkPreventer
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             toolStripStatusScript = new ToolStripStatusLabel();
             toolStripStatusNewWorld = new ToolStripStatusLabel();
-            timer1 = new Timer(components);
+            timer1 = new System.Windows.Forms.Timer(components);
             button1 = new Button();
             tabControl.SuspendLayout();
             About.SuspendLayout();
@@ -163,7 +164,7 @@ namespace NewWorldAfkPreventer
             richTextBox1.ReadOnly = true;
             richTextBox1.Size = new Size(419, 204);
             richTextBox1.TabIndex = 0;
-            richTextBox1.Text = resources.GetString("richTextBox1.Text");
+            richTextBox1.Text = resources.GetString("richTextBox1.Text", System.Globalization.CultureInfo.CurrentCulture) ?? string.Empty;
             // 
             // btnSave
             // 
@@ -246,7 +247,7 @@ namespace NewWorldAfkPreventer
             Font = new Font("0xProto Nerd Font", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             ForeColor = Color.Chartreuse;
             FormBorderStyle = FormBorderStyle.FixedDialog;
-            Icon = (Icon)resources.GetObject("$this.Icon");
+            Icon = (resources.GetObject("$this.Icon", System.Globalization.CultureInfo.CurrentCulture) as Icon) ?? SystemIcons.Application;
             MaximizeBox = false;
             Name = "SettingsForm";
             StartPosition = FormStartPosition.CenterParent;
@@ -284,7 +285,7 @@ namespace NewWorldAfkPreventer
             };
             btnResetHotkey.Click += BtnResetHotkey_Click;
 
-            tabHotkey.Controls.AddRange(new Control[] { lblCurrentHotkey, btnChangeHotkey, btnResetHotkey });
+            tabHotkey?.Controls.AddRange(new Control[] { lblCurrentHotkey, btnChangeHotkey, btnResetHotkey });
         }
 
         private void SetupTimingTab()
@@ -317,10 +318,14 @@ namespace NewWorldAfkPreventer
                 Size = new System.Drawing.Size(30, 20)
             };
 
-            tabTiming.Controls.AddRange(new Control[] {
-                lblMinInterval, nudMinInterval, lblMinutes1,
-                lblMaxInterval, nudMaxInterval, lblMinutes2
-            });
+            if (lblMinInterval != null && nudMinInterval != null && lblMinutes1 != null &&
+                lblMaxInterval != null && nudMaxInterval != null && lblMinutes2 != null)
+            {
+                tabTiming?.Controls.AddRange(new Control[] {
+                    lblMinInterval, nudMinInterval, lblMinutes1,
+                    lblMaxInterval, nudMaxInterval, lblMinutes2
+                });
+            }
         }
 
         private void SetupGeneralTab()
@@ -349,13 +354,13 @@ namespace NewWorldAfkPreventer
             };
             chkAlwaysOnTop.CheckedChanged += ChkAlwaysOnTop_CheckedChanged;
 
-            tabGeneral.Controls.AddRange(new Control[] { chkStartMinimized, chkShowNotifications, chkAlwaysOnTop });
+            tabGeneral?.Controls.AddRange(new Control[] { chkStartMinimized, chkShowNotifications, chkAlwaysOnTop });
         }
 
-        private void ChkAlwaysOnTop_CheckedChanged(object sender, EventArgs e)
+        private void ChkAlwaysOnTop_CheckedChanged(object? sender, EventArgs e)
         {
             // Optionale sofortige Anwendung im SettingsForm selbst
-            this.TopMost = chkAlwaysOnTop.Checked;
+            this.TopMost = chkAlwaysOnTop?.Checked ?? false;
         }
 
         private void LoadSettings()
@@ -375,7 +380,7 @@ namespace NewWorldAfkPreventer
                         Location = new System.Drawing.Point(20, 30),
                         Size = new System.Drawing.Size(300, 20)
                     };
-                    tabHotkey.Controls.Add(lblCurrentHotkey);
+                    tabHotkey?.Controls.Add(lblCurrentHotkey);
                 }
 
                 // Ensure numeric up/downs have been created
@@ -384,10 +389,9 @@ namespace NewWorldAfkPreventer
                 if (nudMaxInterval != null)
                     nudMaxInterval.Value = Math.Max(nudMaxInterval.Minimum, Math.Min(nudMaxInterval.Maximum, settings.MaxInterval / 60000)); // Convert to minutes
 
-                chkStartMinimized.Checked = settings.StartMinimized;
-                chkShowNotifications.Checked = settings.ShowNotifications;
-                if (chkAlwaysOnTop != null)
-                    chkAlwaysOnTop.Checked = settings.AlwaysOnTop;
+                if (chkStartMinimized != null) chkStartMinimized.Checked = settings.StartMinimized;
+                if (chkShowNotifications != null) chkShowNotifications.Checked = settings.ShowNotifications;
+                if (chkAlwaysOnTop != null) chkAlwaysOnTop.Checked = settings.AlwaysOnTop;
                 this.TopMost = settings.AlwaysOnTop;
             }
             else
@@ -404,7 +408,7 @@ namespace NewWorldAfkPreventer
                         Location = new System.Drawing.Point(20, 30),
                         Size = new System.Drawing.Size(300, 20)
                     };
-                    tabHotkey.Controls.Add(lblCurrentHotkey);
+                    tabHotkey?.Controls.Add(lblCurrentHotkey);
                 }
 
                 // Set default values for the controls when settings is null
@@ -417,11 +421,11 @@ namespace NewWorldAfkPreventer
             }
         }
 
-        private void BtnChangeHotkey_Click(object sender, EventArgs e)
+        private void BtnChangeHotkey_Click(object? sender, EventArgs e)
         {
             using (HotkeyRecorder recorder = new HotkeyRecorder())
             {
-                if (recorder.ShowDialog() == DialogResult.OK)
+                if (recorder.ShowDialog(this) == DialogResult.OK)
                 {
                     if (settings != null)
                     {
@@ -435,7 +439,7 @@ namespace NewWorldAfkPreventer
             }
         }
 
-        private void BtnResetHotkey_Click(object sender, EventArgs e)
+        private void BtnResetHotkey_Click(object? sender, EventArgs e)
         {
             if (settings != null)
             {
@@ -446,87 +450,161 @@ namespace NewWorldAfkPreventer
             }
         }
 
-        private void BtnSave_Click(object sender, EventArgs e)
+        private void BtnSave_Click(object? sender, EventArgs e)
         {
             // Update settings from form
-            if (settings != null)
+            if (nudMinInterval != null && nudMaxInterval != null && chkStartMinimized != null &&
+                chkShowNotifications != null && chkAlwaysOnTop != null)
             {
                 settings.MinInterval = (int)nudMinInterval.Value * 60000; // Convert minutes to milliseconds
                 settings.MaxInterval = (int)nudMaxInterval.Value * 60000; // Convert minutes to milliseconds
                 settings.StartMinimized = chkStartMinimized.Checked;
                 settings.ShowNotifications = chkShowNotifications.Checked;
                 settings.AlwaysOnTop = chkAlwaysOnTop.Checked;
-
-                // Save settings
-                settings.Save();
-
-                // Re-register hotkey immediately so the new hotkey takes effect
-                AfkPreventer? mainForm = Application.OpenForms.OfType<AfkPreventer>().FirstOrDefault();
-                if (mainForm != null)
-                {
-                    mainForm.TopMost = settings.AlwaysOnTop;
-                    mainForm.ReRegisterHotkey();
-                }
             }
 
-            this.DialogResult = DialogResult.OK;
-            this.Close();
+            // Save settings
+            settings.Save();
+
+            DialogResult = DialogResult.OK;
+            Close();
         }
 
-        private void BtnCancel_Click(object sender, EventArgs e)
+        private void BtnCancel_Click(object? sender, EventArgs e)
         {
             this.DialogResult = DialogResult.Cancel;
             this.Close();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void timer1_Tick(object? sender, EventArgs e)
         {
             bool newWorldRunning = IsNewWorldRunning();
-            toolStripStatusNewWorld.Text = newWorldRunning ? "New World detected." : "New World not detected.";
+            if (toolStripStatusNewWorld != null)
+                toolStripStatusNewWorld.Text = newWorldRunning ? "New World detected." : "New World not detected.";
 
             // Find the main AfkPreventer form instance
             AfkPreventer? mainForm = Application.OpenForms.OfType<AfkPreventer>().FirstOrDefault();
 
-            if (mainForm != null && mainForm.IsRunning && newWorldRunning)
+            if (toolStripStatusScript != null)
             {
-                toolStripStatusScript.Text = "Script is running.";
-            }
-            else
-            {
-                toolStripStatusScript.Text = "Script is not running.";
+                toolStripStatusScript.Text = (mainForm != null && mainForm.IsRunning && newWorldRunning)
+                    ? "Script is running."
+                    : "Script is not running.";
             }
         }
 
-        private bool IsNewWorldRunning()
+        private static bool IsNewWorldRunning()
         {
-            Process[] processes = Process.GetProcessesByName("NewWorld");
-            if (processes.Length == 0) return false;
-
             try
             {
-                IntPtr hwnd = processes[0].MainWindowHandle;
-                if (hwnd == IntPtr.Zero) return false; // Check if main window handle is valid
+                Debug.WriteLine("Checking for New World process...");
 
-                // Use GetWindowText to check if the window has a title (is visible)
-                System.Text.StringBuilder text = new System.Text.StringBuilder(256);
-                GetWindowText(hwnd, text, 256);
-                return !string.IsNullOrEmpty(text.ToString()) && IsWindowVisible(hwnd);
+                // First try by process name
+                Process[] processes = Process.GetProcessesByName("NewWorld");
+                Debug.WriteLine($"Found {processes.Length} processes named 'NewWorld'");
+
+                if (processes.Length == 0)
+                {
+                    Debug.WriteLine("Searching all processes for New World window...");
+                    // Get all processes
+                    processes = Process.GetProcesses();
+                    Debug.WriteLine($"Found {processes.Length} total processes");
+
+                    // Filter processes with visible windows
+                    processes = processes.Where(p =>
+                    {
+                        try
+                        {
+                            if (p.HasExited || p.MainWindowHandle == IntPtr.Zero)
+                                return false;
+
+                            char[] text = new char[256];
+                            int length = GetWindowText(p.MainWindowHandle, text, text.Length);
+
+                            if (length > 0 && IsWindowVisible(p.MainWindowHandle))
+                            {
+                                string windowTitle = new string(text, 0, length);
+                                Debug.WriteLine($"Found window: {windowTitle} (Process: {p.ProcessName})");
+                                return windowTitle.Contains("New World", StringComparison.OrdinalIgnoreCase);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"Error checking process {p.ProcessName}: {ex.Message}");
+                        }
+                        return false;
+                    }).ToArray();
+
+                    Debug.WriteLine($"Found {processes.Length} processes with New World in title");
+                }
+
+                // Check each process in detail
+                foreach (Process process in processes)
+                {
+                    try
+                    {
+                        Debug.WriteLine($"Checking process: {process.ProcessName}");
+
+                        if (process.HasExited)
+                        {
+                            Debug.WriteLine("Process has exited, skipping");
+                            continue;
+                        }
+
+                        IntPtr handle = process.MainWindowHandle;
+                        if (handle == IntPtr.Zero)
+                        {
+                            Debug.WriteLine("Process has no main window, skipping");
+                            continue;
+                        }
+
+                        if (!IsWindowVisible(handle))
+                        {
+                            Debug.WriteLine("Window is not visible, skipping");
+                            continue;
+                        }
+
+                        char[] text = new char[256];
+                        int length = GetWindowText(handle, text, text.Length);
+                        if (length > 0)
+                        {
+                            string windowTitle = new string(text, 0, length);
+                            Debug.WriteLine($"Window title: {windowTitle}");
+
+                            if (windowTitle.Contains("New World", StringComparison.OrdinalIgnoreCase))
+                            {
+                                Debug.WriteLine("New World found!");
+                                return true;
+                            }
+                        }
+                        else
+                        {
+                            Debug.WriteLine("Window has no title");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Error checking process: {ex.Message}");
+                    }
+                }
+
+                Debug.WriteLine("New World not found");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Handle potential exceptions, such as access denied
-                return false;
+                Debug.WriteLine($"Error in IsNewWorldRunning: {ex.Message}");
             }
+            return false;
         }
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool IsWindowVisible(IntPtr hWnd);
 
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        static extern int GetWindowText(IntPtr hWnd, System.Text.StringBuilder lpString, int nMaxCount);
+        [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern int GetWindowText(IntPtr hWnd, char[] lpString, int nMaxCount);
 
-        private void button1_Click(object sender, EventArgs e)
+        private void button1_Click(object? sender, EventArgs e)
         {
             Application.Exit();
         }

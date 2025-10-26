@@ -14,10 +14,11 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyCopyrightAttribute("Copyright © 2024")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e7d6ad965b824acb7d772c62cf09285262291064")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cea4b47d72fb5930d06637198bd6d44faaf4068a")]
 [assembly: System.Reflection.AssemblyProductAttribute("New World AFK Preventer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("New World AFK Preventer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
+[assembly: System.Resources.NeutralResourcesLanguageAttribute("en-US")]
 [assembly: System.Runtime.Versioning.TargetPlatformAttribute("Windows7.0")]
 [assembly: System.Runtime.Versioning.SupportedOSPlatformAttribute("Windows7.0")]
 

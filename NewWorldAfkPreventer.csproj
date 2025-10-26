@@ -5,6 +5,7 @@
     <TargetFramework>net8.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>app.ico</ApplicationIcon>
     <AssemblyTitle>New World AFK Preventer</AssemblyTitle>
     <AssemblyDescription>A tool to prevent AFK kicks in New World using smart key presses</AssemblyDescription>
@@ -24,10 +25,14 @@
     <AssemblyOriginatorKeyFile>NewWorldAfkPreventer.snk</AssemblyOriginatorKeyFile>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <WarningsAsErrors>true</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Include="app.ico" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="anti-afk.ps1" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="logo.png" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

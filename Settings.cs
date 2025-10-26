@@ -2,18 +2,22 @@ using System;
 using System.IO;
 using System.Text.Json;
 using System.Windows.Forms;
+using System.Globalization;
+using System.Diagnostics;
 
 namespace NewWorldAfkPreventer
 {
     public class AppSettings
     {
+        private static readonly JsonSerializerOptions SerializerOptions = new() { WriteIndented = true };
+
         public Keys Hotkey { get; set; } = Keys.F12;
         public Keys HotkeyModifier { get; set; } = Keys.Control;
         public int MinInterval { get; set; } = 180000;
         public int MaxInterval { get; set; } = 480000;
         public bool StartMinimized { get; set; } = true;
         public bool ShowNotifications { get; set; } = true;
-        public bool AlwaysOnTop { get; set; } = false;
+        public bool AlwaysOnTop { get; set; }
 
         private static string GetSettingsPath()
         {
@@ -26,7 +30,7 @@ namespace NewWorldAfkPreventer
         {
             try
             {
-                string json = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
+                string json = JsonSerializer.Serialize(this, SerializerOptions);
                 File.WriteAllText(GetSettingsPath(), json);
             }
             catch (Exception ex)
@@ -57,22 +61,34 @@ namespace NewWorldAfkPreventer
 
     public class HotkeyRecorder : Form
     {
-        private Label lblInstruction;
-        private Label lblCurrentKeys;
-        private Button btnOk;
-        private Button btnCancel;
+        private readonly Label lblInstruction;
+        private readonly Label lblCurrentKeys;
+        private readonly Button btnOk;
+        private readonly Button btnCancel;
         private Keys recordedKey = Keys.None;
         private Keys recordedModifier = Keys.None;
 
         public Keys Hotkey { get; private set; } = Keys.None;
         public Keys Modifier { get; private set; } = Keys.None;
-        public bool Success { get; private set; } = false;
 
         public HotkeyRecorder()
         {
+            this.lblInstruction = new Label();
+            this.lblCurrentKeys = new Label();
+            this.btnOk = new Button();
+            this.btnCancel = new Button();
             InitializeComponent();
             this.KeyPreview = true;
-            this.KeyDown += HotkeyRecorder_KeyDown;
+            this.KeyDown += OnKeyDown;
+            this.FormClosing += HotkeyRecorder_FormClosing; // Add FormClosing event handler
+            this.ActiveControl = null; // Ensure form receives key events
+            this.TopMost = true; // Ensure the recorder stays on top
+            this.Shown += (sender, e) => { this.Focus(); }; // Explicitly set focus when shown
+        }
+
+        private void HotkeyRecorder_FormClosing(object? sender, FormClosingEventArgs e)
+        {
+            Debug.WriteLine($"HotkeyRecorder FormClosing: {e.CloseReason}");
         }
 
         private void InitializeComponent()
@@ -84,45 +100,33 @@ namespace NewWorldAfkPreventer
             this.MaximizeBox = false;
             this.MinimizeBox = false;
 
-            lblInstruction = new Label
-            {
-                Text = "Press the key combination you want to use as hotkey:",
-                Location = new System.Drawing.Point(20, 20),
-                Size = new System.Drawing.Size(310, 20)
-            };
+            lblInstruction.Text = "Press the key combination you want to use as hotkey:";
+            lblInstruction.Location = new System.Drawing.Point(20, 20);
+            lblInstruction.Size = new System.Drawing.Size(310, 20);
 
-            lblCurrentKeys = new Label
-            {
-                Text = "Waiting for input...",
-                Location = new System.Drawing.Point(20, 50),
-                Size = new System.Drawing.Size(310, 30),
-                Font = new System.Drawing.Font(Font, System.Drawing.FontStyle.Bold),
-                ForeColor = System.Drawing.Color.Blue
-            };
+            lblCurrentKeys.Text = "Waiting for input...";
+            lblCurrentKeys.Location = new System.Drawing.Point(20, 50);
+            lblCurrentKeys.Size = new System.Drawing.Size(310, 30);
+            lblCurrentKeys.Font = new System.Drawing.Font(Font, System.Drawing.FontStyle.Bold);
+            lblCurrentKeys.ForeColor = System.Drawing.Color.Blue;
 
-            btnOk = new Button
-            {
-                Text = "OK",
-                Location = new System.Drawing.Point(100, 120),
-                Size = new System.Drawing.Size(80, 30),
-                Enabled = false
-            };
+            btnOk.Text = "OK";
+            btnOk.Location = new System.Drawing.Point(100, 120);
+            btnOk.Size = new System.Drawing.Size(80, 30);
+            btnOk.Enabled = false;
             btnOk.Click += BtnOk_Click;
 
-            btnCancel = new Button
-            {
-                Text = "Cancel",
-                Location = new System.Drawing.Point(190, 120),
-                Size = new System.Drawing.Size(80, 30)
-            };
+            btnCancel.Text = "Cancel";
+            btnCancel.Location = new System.Drawing.Point(190, 120);
+            btnCancel.Size = new System.Drawing.Size(80, 30);
             btnCancel.Click += BtnCancel_Click;
 
             this.Controls.AddRange(new Control[] { lblInstruction, lblCurrentKeys, btnOk, btnCancel });
         }
 
-        private void HotkeyRecorder_KeyDown(object sender, KeyEventArgs e)
+        protected void OnKeyDown(object? sender, KeyEventArgs e)
         {
-            e.Handled = true;
+            // e.Handled = true; // Removed to allow propagation
 
             // Check for modifier keys
             Keys modifiers = Keys.None;
@@ -157,19 +161,18 @@ namespace NewWorldAfkPreventer
             btnOk.Enabled = true;
         }
 
-        private void BtnOk_Click(object sender, EventArgs e)
+        private void BtnOk_Click(object? sender, EventArgs e)
         {
             if (recordedKey != Keys.None)
             {
                 Hotkey = recordedKey;
                 Modifier = recordedModifier;
-                Success = true;
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }
         }
 
-        private void BtnCancel_Click(object sender, EventArgs e)
+        private void BtnCancel_Click(object? sender, EventArgs e)
         {
             this.DialogResult = DialogResult.Cancel;
             this.Close();
